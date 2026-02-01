@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolarSignupNG - Nigeria's Solar Demand Registry</title>
+    <style>
+        :root {
+            --primary: #1a5f7a;
+            --secondary: #159895;
+            --accent: #57c5b6;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7fa;
+            scroll-behavior: smooth;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 1.2rem;
+            color: var(--dark);
+        }
+        
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 0;
+            border-bottom: none;
+        }
+        
+        .hero h1 {
+            color: white;
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .mission-statement {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-section {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .form-subsection {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            margin-bottom: 2rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+        
+        .form-subsection h4 {
+            margin-top: 0;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(87, 197, 182, 0.2);
+        }
+        
+        .readonly-field {
+            background-color: #e9ecef;
+            color: var(--gray);
+        }
+        
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 0.5rem;
+        }
+        
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .radio-option input, .checkbox-option input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        .inline-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        .inline-inputs > div {
+            flex: 1;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .coverage-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 1.5rem;
+        }
+        
+        .coverage-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .coverage-card:hover {
+            border-color: var(--accent);
+            background-color: #f8f9fa;
+        }
+        
+        .coverage-card.selected {
+            border-color: var(--secondary);
+            background-color: rgba(21, 152, 149, 0.05);
+        }
+        
+        .coverage-card h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+        
+        .coverage-percentage {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .privacy-notice {
+            background-color: #f8f9fa;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .geo-status {
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .geo-success {
+            color: var(--success);
+        }
+        
+        .geo-error {
+            color: var(--danger);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 40px 0;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.7rem;
+            }
+            
+            section {
+                padding: 40px 0;
+            }
+            
+            .form-section {
+                padding: 25px;
+            }
+            
+            .inline-inputs {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .coverage-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .coverage-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>SolarSignupNG</h1>
+            <p>Nigeria's Verified Solar Demand Registry</p>
+            <div class="mission-statement">
+                <p>Registering genuine solar interest from homes and businesses to enable data-driven energy planning, reliable deployment, and future-ready sustainable energy systems for Nigeria.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Why We Started -->
+    <section id="why-started">
+        <div class="container">
+            <h2>Why We Started</h2>
+            <div class="card">
+                <p>SolarSignupNG was created during Nigeria's Solar Power Naija initiative under the National Electrification Project. The program aimed to expand solar access to 5 million households through private solar companies.</p>
+                <p>However, a critical gap emerged: while financing was available for solar companies (supply-side), there was no verified registry of Nigerian households and businesses genuinely interested in solar installations (demand-side).</p>
+                <p>Without visibility into real, qualified demand, deployment planning remained speculative, leaving many potential beneficiaries without access despite available funding.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Why Previous Programs Failed -->
+    <section id="why-failed">
+        <div class="container">
+            <h2>Why Previous Programs Underperformed</h2>
+            <div class="card">
+                <h3>Supply-Side Focus Without Demand Intelligence</h3>
+                <p>Previous initiatives prioritized financing solar companies without mapping where real, qualified customers existed. This created a disconnect between available capacity and actual uptake.</p>
+                
+                <h3>Lack of Verified Beneficiary Database</h3>
+                <p>Without a centralized registry of verified interest, solar companies lacked reliable pipelines, leading to high customer acquisition costs and inefficient deployment.</p>
+                
+                <h3>Most Nigerians Never Personally Experienced Solar</h3>
+                <p>Without a mechanism to express genuine interest, the majority of potential beneficiaries remained invisible to implementers, perpetuating energy access gaps despite available solutions.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Our Repositioning -->
+    <section id="repositioning">
+        <div class="container">
+            <h2>Our Repositioning: Solar Demand Registry</h2>
+            <div class="card">
+                <p>SolarSignupNG is now repositioned as Nigeria's neutral solar demand registry—a platform that aggregates, verifies, and qualifies solar interest to enable efficient, data-driven energy access expansion.</p>
+                
+                <h3>How It Works</h3>
+                <ul>
+                    <li><strong>Demand Aggregation:</strong> Register genuine interest from homes and businesses</li>
+                    <li><strong>Lead Qualification:</strong> Pre-assess feasibility based on property, usage, and location data</li>
+                    <li><strong>Market Intelligence:</strong> Provide solar companies with verified customer pipelines</li>
+                    <li><strong>Planning Support:</strong> Enable data-driven deployment for financiers, governments, and developers</li>
+                </ul>
+                
+                <h3>Applications</h3>
+                <ul>
+                    <li>Private solar company customer acquisition</li>
+                    <li>Financing program design and targeting</li>
+                    <li>ESG and carbon credit project development</li>
+                    <li>Structured rollout planning for utilities and developers</li>
+                    <li>Feasibility analysis for mini-grid and off-grid projects</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Solar Interest Registration Form -->
+    <section id="registration">
+        <div class="container">
+            <h2>Solar Interest Registration Form</h2>
+            <p>Complete this form to register your interest in solar power for your property. All information is confidential and used solely for solar planning purposes.</p>
+            
+            <div class="form-section">
+                <div id="form-status" class="status-message"></div>
+                
+                <form id="solar-registration-form">
+                    <!-- Identity & Contact -->
+                    <div class="form-subsection">
+                        <h4>Identity & Contact Information</h4>
+                        
+                        <div class="form-group">
+                            <label for="full-name">Full Name *</label>
+                            <input type="text" id="full-name" name="full-name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address (Optional)</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                    </div>
+                    
+                    <!-- Location -->
+                    <div class="form-subsection">
+                        <h4>Location Details</h4>
+                        
+                        <div class="form-group">
+                            <label for="state">State of Residence *</label>
+                            <select id="state" name="state" required>
+                                <option value="">Select State</option>
+                                <option value="Abia">Abia</option>
+                                <option value="Adamawa">Adamawa</option>
+                                <option value="Akwa Ibom">Akwa Ibom</option>
+                                <option value="Anambra">Anambra</option>
+                                <option value="Bauchi">Bauchi</option>
+                                <option value="Bayelsa">Bayelsa</option>
+                                <option value="Benue">Benue</option>
+                                <option value="Borno">Borno</option>
+                                <option value="Cross River">Cross River</option>
+                                <option value="Delta">Delta</option>
+                                <option value="Ebonyi">Ebonyi</option>
+                                <option value="Edo">Edo</option>
+                                <option value="Ekiti">Ekiti</option>
+                                <option value="Enugu">Enugu</option>
+                                <option value="FCT">Federal Capital Territory</option>
+                                <option value="Gombe">Gombe</option>
+                                <option value="Imo">Imo</option>
+                                <option value="Jigawa">Jigawa</option>
+                                <option value="Kaduna">Kaduna</option>
+                                <option value="Kano">Kano</option>
+                                <option value="Katsina">Katsina</option>
+                                <option value="Kebbi">Kebbi</option>
+                                <option value="Kogi">Kogi</option>
+                                <option value="Kwara">Kwara</option>
+                                <option value="Lagos">Lagos</option>
+                                <option value="Nasarawa">Nasarawa</option>
+                                <option value="Niger">Niger</option>
+                                <option value="Ogun">Ogun</option>
+                                <option value="Ondo">Ondo</option>
+                                <option value="Osun">Osun</option>
+                                <option value="Oyo">Oyo</option>
+                                <option value="Plateau">Plateau</option>
+                                <option value="Rivers">Rivers</option>
+                                <option value="Sokoto">Sokoto</option>
+                                <option value="Taraba">Taraba</option>
+                                <option value="Yobe">Yobe</option>
+                                <option value="Zamfara">Zamfara</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Full Address *</label>
+                            <textarea id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Exact Geolocation</label>
+                            <p style="margin-bottom: 10px; font-size: 0.9rem; color: var(--gray);">Click the button below to capture your location. This helps with solar potential assessment.</p>
+                            <button type="button" id="get-location" class="btn btn-small">Capture My Location</button>
+                            <span id="geo-status" class="geo-status"></span>
+                            
+                            <div class="inline-inputs" style="margin-top: 15px;">
+                                <div>
+                                    <label for="latitude">Latitude</label>
+                                    <input type="text" id="latitude" name="latitude" class="readonly-field" readonly>
+                                </div>
+                                <div>
+                                    <label for="longitude">Longitude</label>
+                                    <input type="text" id="longitude" name="longitude" class="readonly-field" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Property & Electricity Usage -->
+                    <div class="form-subsection">
+                        <h4>Property & Electricity Usage</h4>
+                        
+                        <div class="form-group">
+                            <label for="property-type">Type of Property *</label>
+                            <select id="property-type" name="property-type" required>
+                                <option value="">Select property type</option>
+                                <option value="flat">Flat</option>
+                                <option value="duplex">Duplex</option>
+                                <option value="bungalow">Bungalow</option>
+                                <option value="office">Office / Shop</option>
+                                <option value="factory">Factory / Warehouse</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="occupants">Number of People Living/Working in Property *</label>
+                            <input type="number" id="occupants" name="occupants" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Current Electricity Meter Type *</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="single-phase" name="meter-type" value="single-phase" required>
+                                    <label for="single-phase">Single Phase</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="three-phase" name="meter-type" value="three-phase">
+                                    <label for="three-phase">Three Phase</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="distribution-band">Electricity Distribution Band *</label>
+                            <select id="distribution-band" name="distribution-band" required>
+                                <option value="">Select distribution band</option>
+                                <option value="band-a">Band A</option>
+                                <option value="band-b">Band B</option>
+                                <option value="band-c">Band C</option>
+                                <option value="band-d">Band D</option>
+                                <option value="band-e">Band E</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="consumption-unit">Average Monthly Electricity Consumption</label>
+                            <div class="inline-inputs">
+                                <div>
+                                    <input type="number" id="consumption-value" name="consumption-value" min="0" step="0.01">
+                                </div>
+                                <div>
+                                    <select id="consumption-unit" name="consumption-unit">
+                                        <option value="kwh">kWh</option>
+                                        <option value="naira">₦ (Naira)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="last-months-usage">Last 3 Months Electricity Usage (Optional)</label>
+                            <div class="inline-inputs">
+                                <div>
+                                    <input type="number" id="last-months-value" name="last-months-value" min="0" step="0.01" placeholder="Amount">
+                                </div>
+                                <div>
+                                    <select id="last-months-unit" name="last-months-unit">
+                                        <option value="kwh">kWh</option>
+                                        <option value="naira">₦ (Naira)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bill-upload">Upload Recent Electricity Bills (Optional)</label>
+                            <input type="file" id="bill-upload" name="bill-upload" accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                    </div>
+                    
+                    <!-- Solar Intent & Education -->
+                    <div class="form-subsection">
+                        <h4>Solar Intent & System Options</h4>
+                        
+                        <div style="background-color: #e8f4f8; padding: 15px; border-radius: var(--radius); margin-bottom: 20px;">
+                            <h4 style="color: var(--primary); margin-top: 0;">Understanding Solar System Types</h4>
+                            <p><strong>UPS-style Solar Systems:</strong> Typically power-bank-like systems providing short-duration backup (4-8 hours) for essential lights and appliances during grid outages.</p>
+                            <p><strong>Standalone Solar Systems:</strong> More comprehensive systems designed for longer autonomy (1-3 days), capable of powering multiple appliances with energy-aware usage patterns.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Desired Solar Coverage Level *</label>
+                            <p style="margin-bottom: 15px; color: var(--gray);">Select the level of solar coverage you're interested in for your property:</p>
+                            
+                            <div class="coverage-options">
+                                <div class="coverage-card" data-value="30">
+                                    <div class="coverage-percentage">30%</div>
+                                    <h4>Basic Backup</h4>
+                                    <p>Mostly UPS use: few lights/appliances for short duration, or limited appliances for longer standalone usage.</p>
+                                </div>
+                                
+                                <div class="coverage-card" data-value="50">
+                                    <div class="coverage-percentage">50%</div>
+                                    <h4>Moderate Coverage</h4>
+                                    <p>Some appliances for longer periods or many appliances for shorter periods.</p>
+                                </div>
+                                
+                                <div class="coverage-card" data-value="70">
+                                    <div class="coverage-percentage">70%</div>
+                                    <h4>Substantial Coverage</h4>
+                                    <p>Most appliances with energy awareness and usage discipline.</p>
+                                </div>
+                                
+                                <div class="coverage-card" data-value="100">
+                                    <div class="coverage-percentage">100%</div>
+                                    <h4>Full Coverage</h4>
+                                    <p>Full appliance coverage: typically ~2 hours in UPS mode or up to ~2 days autonomy in standalone systems.</p>
+                                </div>
+                            </div>
+                            <input type="hidden" id="coverage-level" name="coverage-level" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Referral Section -->
+                    <div class="form-subsection">
+                        <h4>Refer a Person to the Program (Optional)</h4>
+                        <p style="margin-bottom: 15px; color: var(--gray);">Help others benefit from solar access. Our team can contact them with the signup link or assign a call agent to assist with registration.</p>
+                        
+                        <div class="form-group">
+                            <label for="referral-name">Name of Person You're Referring</label>
+                            <input type="text" id="referral-name" name="referral-name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="referral-phone">Phone Number of Person You're Referring</label>
+                            <input type="tel" id="referral-phone" name="referral-phone">
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Notice -->
+                    <div class="privacy-notice">
+                        <h4>Data Usage & Privacy Notice</h4>
+                        <p>Your information is collected solely for solar demand aggregation and feasibility assessment purposes. Data may be shared (in aggregated, anonymized form) with solar companies, financiers, and planning agencies to facilitate solar deployment. No personal data is sold to third parties. By submitting this form, you consent to being contacted by solar service providers regarding your interest.</p>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button type="submit" id="submit-form" class="btn">Submit Solar Interest Registration</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <p>SolarSignupNG - Nigeria's Solar Demand Registry</p>
+            <p style="margin-top: 10px; opacity: 0.8;">A neutral platform for solar interest aggregation and feasibility assessment</p>
+            <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">© SolarSignupNG. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Geolocation functionality
+            const geoBtn = document.getElementById('get-location');
+            const latitudeField = document.getElementById('latitude');
+            const longitudeField = document.getElementById('longitude');
+            const geoStatus = document.getElementById('geo-status');
+            
+            geoBtn.addEventListener('click', function() {
+                geoStatus.textContent = 'Capturing location...';
+                geoStatus.className = 'geo-status';
+                
+                if (!navigator.geolocation) {
+                    geoStatus.textContent = 'Geolocation not supported by your browser';
+                    geoStatus.className = 'geo-status geo-error';
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        
+                        latitudeField.value = lat;
+                        longitudeField.value = lng;
+                        
+                        geoStatus.textContent = 'Location captured successfully';
+                        geoStatus.className = 'geo-status geo-success';
+                    },
+                    function(error) {
+                        let errorMessage = 'Unable to retrieve location. ';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += 'Permission denied. Please enable location services.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += 'Location information unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += 'Location request timed out.';
+                                break;
+                            default:
+                                errorMessage += 'Unknown error occurred.';
+                                break;
+                        }
+                        
+                        geoStatus.textContent = errorMessage;
+                        geoStatus.className = 'geo-status geo-error';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+            
+            // Coverage level selection
+            const coverageCards = document.querySelectorAll('.coverage-card');
+            const coverageInput = document.getElementById('coverage-level');
+            
+            coverageCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    coverageCards.forEach(c => c.classList.remove('selected'));
+                    
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                    
+                    // Update hidden input value
+                    coverageInput.value = this.getAttribute('data-value');
+                });
+            });
+            
+            // Form submission handling with Google Sheets integration
+            const form = document.getElementById('solar-registration-form');
+            const formStatus = document.getElementById('form-status');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Stop the default form submission
+                
+                // Basic validation
+                if (!form.checkValidity()) {
+                    formStatus.textContent = 'Please fill in all required fields correctly.';
+                    formStatus.className = 'status-message error';
+                    formStatus.style.display = 'block';
+                    return;
+                }
+                
+                if (!coverageInput.value) {
+                    formStatus.textContent = 'Please select a desired solar coverage level.';
+                    formStatus.className = 'status-message error';
+                    formStatus.style.display = 'block';
+                    return;
+                }
+                
+                // Disable submit button
+                const submitBtn = document.getElementById('submit-form');
+                const originalBtnText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+                
+                // 1. Prepare Form Data
+                const formData = new FormData(this);
+                const dataToSend = {};
+                
+                // Map form field names to Google Sheet column names
+                // This mapping ensures data goes to the correct columns in your sheet
+                const fieldMapping = {
+                    'full-name': 'Full Name',
+                    'phone': 'Phone',
+                    'email': 'Email',
+                    'state': 'State',
+                    'address': 'Address',
+                    'latitude': 'Latitude',
+                    'longitude': 'Longitude',
+                    'property-type': 'Property Type',
+                    'occupants': 'Occupants',
+                    'meter-type': 'Meter Type',
+                    'distribution-band': 'Distribution Band',
+                    'consumption-value': 'Avg Consumption Value',
+                    'consumption-unit': 'Avg Consumption Unit',
+                    'last-months-value': 'Last 3 Months Value',
+                    'last-months-unit': 'Last 3 Months Unit',
+                    'coverage-level': 'Coverage Level',
+                    'referral-name': 'Referral Name',
+                    'referral-phone': 'Referral Phone'
+                };
+                
+                // Process form data using mapping
+                formData.forEach((value, key) => {
+                    if (fieldMapping[key]) {
+                        dataToSend[fieldMapping[key]] = value;
+                    }
+                });
+                
+                // Add geolocation data explicitly (not in FormData for readonly fields)
+                dataToSend['Latitude'] = document.getElementById('latitude').value;
+                dataToSend['Longitude'] = document.getElementById('longitude').value;
+                dataToSend['Coverage Level'] = document.getElementById('coverage-level').value;
+                
+                // 2. Send Data to Google Apps Script
+                // USING YOUR ACTUAL WEB APP URL
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbz8eIPRBkBSqyLQ6tbyFdU9GUiz3IfKCYtX2w--sKJ8YfKTYB6ljOU_AZvJNdfLgMuElA/exec';
+                
+                fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Required for cross-origin requests to Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(dataToSend).toString()
+                })
+                .then(() => { // Use .then() since 'no-cors' mode returns an opaque response
+                    // Show success message
+                    formStatus.innerHTML = `
+                        <h4>Registration Submitted Successfully!</h4>
+                        <p>Thank you for registering your interest in solar power. Your information has been added to Nigeria's Solar Demand Registry.</p>
+                        <p>Solar service providers may contact you using the contact information provided to discuss solar options for your property.</p>
+                    `;
+                    formStatus.className = 'status-message success';
+                    formStatus.style.display = 'block';
+                    
+                    // Reset the form
+                    form.reset();
+                    document.getElementById('latitude').value = '';
+                    document.getElementById('longitude').value = '';
+                    coverageCards.forEach(c => c.classList.remove('selected'));
+                    coverageInput.value = '';
+                    geoStatus.textContent = '';
+                    geoStatus.className = 'geo-status';
+                    
+                    // Scroll to success message
+                    formStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                })
+                .catch(error => {
+                    // Show error message
+                    formStatus.textContent = 'There was an error submitting the form. Please check your connection and try again.';
+                    formStatus.className = 'status-message error';
+                    formStatus.style.display = 'block';
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    // Re-enable the button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                });
+            });
+            
+            // Form validation for phone numbers
+            const phoneInput = document.getElementById('phone');
+            const referralPhoneInput = document.getElementById('referral-phone');
+            
+            function validatePhone(phone) {
+                // Simple Nigerian phone validation (allows 10-14 digits, may start with 0, +234, or 234)
+                const phoneRegex = /^(0|\+?234|234)?[789][01]\d{8}$/;
+                return phoneRegex.test(phone.replace(/\s/g, ''));
+            }
+            
+            phoneInput.addEventListener('blur', function() {
+                if (this.value && !validatePhone(this.value)) {
+                    this.style.borderColor = 'var(--danger)';
+                    this.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.2)';
+                } else {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                }
+            });
+            
+            if (referralPhoneInput) {
+                referralPhoneInput.addEventListener('blur', function() {
+                    if (this.value && !validatePhone(this.value)) {
+                        this.style.borderColor = 'var(--danger)';
+                        this.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.2)';
+                    } else {
+                        this.style.borderColor = '';
+                        this.style.boxShadow = '';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
