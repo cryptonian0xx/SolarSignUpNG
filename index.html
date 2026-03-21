@@ -88,7 +88,10 @@ nav {
 }
 .hero-bg {
   position:absolute; inset:0;
-  background: url('https://news.uniben.edu/wp-content/uploads/2025/08/solarfarm.jpg') center center / cover no-repeat;
+  background-color: #1a3a2a;
+  background-image: url('https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1600&q=80&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center center;
   opacity:0.45;
 }
 .hero-overlay {
@@ -763,22 +766,24 @@ footer {
 
           <div class="field">
             <label>Average Monthly Electricity Consumption</label>
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">Enter amount — select ₦ Naira or kWh unit</div>
             <div class="field-row">
-              <input type="number" id="consumption-value" name="consumption-value" min="0" step="0.01" placeholder="Amount">
+              <input type="number" id="consumption-value" name="consumption-value" min="0" step="0.01" placeholder="e.g. 15000">
               <select id="consumption-unit" name="consumption-unit">
+                <option value="naira" selected>₦ Naira</option>
                 <option value="kwh">kWh</option>
-                <option value="naira">₦ (Naira)</option>
               </select>
             </div>
           </div>
 
           <div class="field">
             <label>Last 3 Months Usage <span class="opt">(Optional)</span></label>
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">Combined total — select ₦ Naira or kWh unit</div>
             <div class="field-row">
-              <input type="number" id="last-months-value" name="last-months-value" min="0" step="0.01" placeholder="Amount">
+              <input type="number" id="last-months-value" name="last-months-value" min="0" step="0.01" placeholder="e.g. 45000">
               <select id="last-months-unit" name="last-months-unit">
+                <option value="naira" selected>₦ Naira</option>
                 <option value="kwh">kWh</option>
-                <option value="naira">₦ (Naira)</option>
               </select>
             </div>
           </div>
@@ -888,7 +893,8 @@ footer {
       </div>
     </div>
     <div class="footer-bottom">
-      © SolarSignupNG. Nigeria's Solar Demand Registry. All rights reserved.
+      <div>© SolarSignupNG. Nigeria's Solar Demand Registry. All rights reserved.</div>
+      <div style="margin-top:8px;opacity:0.45;font-size:0.72rem">A <strong style="opacity:0.8">Mundez Integrated Services</strong> initiative · Est. 2023</div>
     </div>
   </div>
 </footer>
@@ -1122,6 +1128,12 @@ document.getElementById('solar-registration-form').addEventListener('submit', fu
   data['Latitude']       = document.getElementById('latitude').value;
   data['Longitude']      = document.getElementById('longitude').value;
   data['Coverage Level'] = document.getElementById('coverage-level').value;
+  // Address: always build explicitly from map fields so it never arrives blank
+  var addrHouse  = (document.getElementById('map-house').value  || '').trim();
+  var addrStreet = (document.getElementById('map-street').value || '').trim();
+  var addrCity   = (document.getElementById('map-city').value   || '').trim();
+  var addrState  = (document.getElementById('state').value      || '').trim();
+  data['Address'] = [addrHouse, addrStreet, addrCity, addrState].filter(Boolean).join(', ');
 
   var scriptURL = 'https://script.google.com/macros/s/AKfycbz8eIPRBkBSqyLQ6tbyFdU9GUiz3IfKCYtX2w--sKJ8YfKTYB6ljOU_AZvJNdfLgMuElA/exec';
   fetch(scriptURL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data).toString() })
