@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
 /* ═══════════════════════════ TOKENS ═══════════════════════════ */
 :root {
@@ -32,6 +33,10 @@
   --r-xl: 24px;
   --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
   --shadow-lg: 0 4px 6px rgba(0,0,0,0.05), 0 20px 40px rgba(0,0,0,0.1);
+  /* SunSim accent */
+  --sim-gold: #FBBF24;
+  --sim-orange: #EA580C;
+  --sim-dark: #0a0a0a;
 }
 
 /* ═══════════════════════════ RESET ═══════════════════════════ */
@@ -372,6 +377,36 @@ nav {
   display:flex; align-items:flex-start; gap:6px; line-height:1.5;
 }
 
+/* ======================= STREET VIEW — NULLED OUT (No API key) ======================= */
+/*
+  ALL Street View CSS, HTML, and JS has been disabled.
+  Reason: Google Maps Embed API requires a billing-enabled API key.
+  When an API key is obtained in the future:
+    1. Re-add the Google Maps script: <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
+    2. Un-comment the .sv-section HTML block inside Step 2 of the form.
+    3. Un-comment the Street View JS functions: resetStreetViewState(), loadStreetView(),
+       confirmStreetView(), skipStreetView() and the svLoaded variable.
+    4. Remove the null stubs for those functions.
+    5. Re-enable the GOOGLE_MAPS_KEY variable at the top of the script block.
+  For now the form relies entirely on the aerial Leaflet map pin for location accuracy.
+*/
+
+/* sv-section styles preserved here for future reference — DO NOT ACTIVATE without API key
+.sv-section { ... }
+.sv-header { ... }
+.sv-tag { ... }
+.sv-title { ... }
+.sv-sub { ... }
+.btn-load-sv { ... }
+#sv-map-container { ... }
+#sv-iframe { ... }
+.sv-placeholder { ... }
+.sv-confirm-bar { ... }
+.btn-sv-confirm { ... }
+.btn-sv-skip { ... }
+.sv-confirmed-badge { ... }
+*/
+
 /* PRIVACY BOX */
 .privacy-box {
   background:var(--bg); border:1px solid var(--border);
@@ -444,7 +479,137 @@ footer {
 .mt-4 { margin-top:16px; }
 .mt-6 { margin-top:24px; }
 
-/* ═══════════════════════════ RESPONSIVE ═══════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   SUNSIM UPSELL MODAL - FIXED SCROLLING
+══════════════════════════════════════════════════════ */
+.ss-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(10,10,10,0.88); z-index:9000;
+  /* FIX: overflow-y:auto on the overlay itself lets the whole modal scroll on small screens */
+  overflow-y:auto;
+  padding:24px 16px;
+  backdrop-filter:blur(6px);
+}
+.ss-overlay.active { display:block; }
+
+.ss-modal {
+  width:100%; max-width:600px;
+  /* FIX: No max-height constraint — the overlay scrolls, not the modal */
+  background:#0F1A12;
+  border-radius:24px;
+  border:1px solid rgba(251,191,36,0.25);
+  box-shadow:0 0 60px rgba(251,191,36,0.15), 0 40px 80px rgba(0,0,0,0.5);
+  animation: ssPopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position:relative;
+  margin:0 auto; /* centre horizontally since overlay is now block */
+}
+@keyframes ssPopIn {
+  from { transform:scale(0.88) translateY(20px); opacity:0; }
+  to   { transform:scale(1) translateY(0); opacity:1; }
+}
+
+.ss-sun-band {
+  height:5px;
+  background:linear-gradient(90deg, #FBBF24 0%, #EA580C 50%, #FBBF24 100%);
+  background-size:200% 100%;
+  animation:ssSlide 2.5s linear infinite;
+}
+@keyframes ssSlide { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+.ss-body { padding:32px 32px 28px; }
+
+.ss-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.3);
+  color:#FBBF24; font-size:0.7rem; font-weight:800; letter-spacing:0.1em;
+  text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:18px;
+}
+
+.ss-headline {
+  font-size:clamp(1.3rem,3.5vw,1.75rem); font-weight:800; color:#FFFFFF;
+  line-height:1.2; margin-bottom:8px;
+}
+.ss-headline em { font-style:normal; color:#FBBF24; }
+
+.ss-intro { font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.65; margin-bottom:20px; }
+
+.ss-features {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;
+}
+.ss-feat {
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px; padding:14px;
+}
+.ss-feat-icon { font-size:1.4rem; margin-bottom:6px; }
+.ss-feat-title { font-size:0.82rem; font-weight:700; color:#fff; margin-bottom:3px; }
+.ss-feat-desc { font-size:0.74rem; color:rgba(255,255,255,0.5); line-height:1.5; }
+
+.ss-pitch {
+  background:linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(234,88,12,0.08) 100%);
+  border:1px solid rgba(251,191,36,0.2); border-radius:14px;
+  padding:18px 20px; margin-bottom:20px;
+}
+.ss-pitch p { font-size:0.83rem; color:rgba(255,255,255,0.75); line-height:1.65; margin-bottom:8px; }
+.ss-pitch p:last-child { margin:0; }
+.ss-pitch strong { color:#FBBF24; }
+
+.ss-price-row {
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:12px; margin-bottom:16px;
+  background:rgba(255,255,255,0.04); border-radius:14px; padding:16px 20px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.ss-price-left .ss-price-label { font-size:0.72rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px; }
+.ss-price-amount { font-size:2rem; font-weight:800; color:#FBBF24; line-height:1; }
+.ss-price-amount span { font-size:0.85rem; font-weight:500; color:rgba(255,255,255,0.45); }
+.ss-turnaround { font-size:0.73rem; color:rgba(255,255,255,0.45); margin-top:3px; }
+
+.btn-ss-pay {
+  flex:1; min-width:200px;
+  padding:16px 24px;
+  background:linear-gradient(135deg, #FBBF24 0%, #EA580C 100%);
+  color:#0a0a0a; font-weight:800; font-size:1rem; border:none;
+  border-radius:12px; cursor:pointer;
+  transition:transform 0.15s, box-shadow 0.15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-ss-pay:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 28px rgba(251,191,36,0.4); }
+.btn-ss-pay:disabled { opacity:0.65; cursor:not-allowed; transform:none; }
+
+.ss-skip-row { text-align:center; }
+.btn-ss-skip {
+  background:transparent; border:none; cursor:pointer;
+  font-size:0.8rem; color:rgba(255,255,255,0.35);
+  padding:6px; transition:color 0.15s; text-decoration:underline; text-underline-offset:3px;
+}
+.btn-ss-skip:hover { color:rgba(255,255,255,0.6); }
+.ss-secure { font-size:0.72rem; color:rgba(255,255,255,0.3); text-align:center; margin-top:10px; }
+
+/* SunSim success panel */
+.ss-success { display:none; padding:32px; text-align:center; }
+.ss-success-icon { font-size:3.5rem; margin-bottom:12px; }
+.ss-success-title { font-size:1.4rem; font-weight:800; color:#FBBF24; margin-bottom:8px; }
+.ss-success-body { font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; }
+.ss-receipt-box { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:16px; margin-bottom:20px; text-align:left; }
+.ss-receipt-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.ss-receipt-row:last-child { border:none; }
+.ss-receipt-row span:first-child { font-size:0.75rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+.ss-receipt-row span:last-child { font-size:0.8rem; color:#fff; font-weight:600; text-align:right; max-width:60%; word-break:break-all; }
+.btn-ss-close { width:100%; padding:14px; background:rgba(255,255,255,0.08); color:#fff; font-weight:700; font-size:0.95rem; border:1px solid rgba(255,255,255,0.12); border-radius:12px; cursor:pointer; transition:background 0.15s; }
+.btn-ss-close:hover { background:rgba(255,255,255,0.15); }
+
+/* Cancelled panel */
+.ss-cancelled { display:none; padding:28px 32px; text-align:center; }
+.ss-cancelled-icon { font-size:2.5rem; margin-bottom:10px; }
+.ss-cancelled-title { font-size:1.1rem; font-weight:700; color:#F87171; margin-bottom:6px; }
+.ss-cancelled-body { font-size:0.85rem; color:rgba(255,255,255,0.55); margin-bottom:18px; line-height:1.6; }
+.ss-cancelled-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.btn-ss-retry { padding:12px 24px; background:linear-gradient(135deg, #FBBF24, #EA580C); color:#0a0a0a; font-weight:800; font-size:0.9rem; border:none; border-radius:10px; cursor:pointer; transition:transform 0.15s; }
+.btn-ss-retry:hover { transform:translateY(-1px); }
+.btn-ss-cancel-close { padding:12px 22px; background:transparent; color:rgba(255,255,255,0.4); font-weight:600; font-size:0.9rem; border:1px solid rgba(255,255,255,0.12); border-radius:10px; cursor:pointer; transition:all 0.15s; }
+.btn-ss-cancel-close:hover { color:rgba(255,255,255,0.7); }
+
+/* Responsive */
 @media (max-width:640px) {
   .nav-inner { padding:0 16px; }
   .hero-content { padding:60px 16px 40px; }
@@ -469,6 +634,8 @@ footer {
   .btn-prev, .btn-next { width:100%; justify-content:center; }
   .footer-top { flex-direction:column; gap:28px; }
   .hiw-grid { grid-template-columns:1fr 1fr; }
+  .ss-features { grid-template-columns:1fr; }
+  .ss-body { padding:24px 20px 20px; }
 }
 @media (max-width:380px) {
   .coverage-grid { grid-template-columns:1fr; }
@@ -476,6 +643,229 @@ footer {
   .form-steps { flex-direction:column; border-radius:var(--r); }
   .form-step-tab { border-radius:var(--r-sm); text-align:left; }
 }
+
+/* ═══════════════════════════ NAV PAY LINK ═══════════════════════════ */
+.nav-pay-link {
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  font-weight: 600; font-size: 0.8rem;
+  padding: 7px 14px; border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.18);
+  transition: all 0.15s; white-space: nowrap;
+}
+.nav-pay-link:hover {
+  background: rgba(251,191,36,0.1);
+  border-color: rgba(251,191,36,0.4);
+  color: #FBBF24;
+}
+@media (max-width:500px) {
+  .nav-pay-link { display: none; }
+}
+
+/* ═══════════════════════════ ALREADY REGISTERED BAND ═══════════════════════════ */
+.pay-band {
+  background: linear-gradient(135deg, #0F1A12 0%, #1a2e1a 100%);
+  border-top: 1px solid rgba(251,191,36,0.15);
+  border-bottom: 1px solid rgba(251,191,36,0.15);
+  padding: 40px 24px;
+}
+.pay-band-inner {
+  max-width: 780px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.pay-band-text h3 {
+  font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 6px;
+}
+.pay-band-text p {
+  font-size: 0.88rem; color: rgba(255,255,255,0.55); line-height: 1.6; margin: 0;
+  max-width: 460px;
+}
+.btn-pay-band {
+  background: linear-gradient(135deg, #FBBF24 0%, #EA580C 100%);
+  color: #0a0a0a; font-weight: 800; font-size: 0.95rem;
+  padding: 13px 26px; border-radius: 50px; border: none;
+  white-space: nowrap; flex-shrink: 0;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-pay-band:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(251,191,36,0.35); }
+
+/* ═══════════════════════════ PAY LOOKUP MODAL ═══════════════════════════ */
+.pl-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(10,10,10,0.88); z-index: 9100;
+  overflow-y: auto; padding: 24px 16px;
+  backdrop-filter: blur(6px);
+}
+.pl-overlay.active { display: block; }
+
+.pl-modal {
+  width: 100%; max-width: 480px; margin: 0 auto;
+  background: #fff; border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg);
+  animation: plPopIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  overflow: hidden;
+}
+@keyframes plPopIn {
+  from { transform: scale(0.9) translateY(16px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.pl-header {
+  background: linear-gradient(135deg, #0F1A12 0%, #1a2e1a 100%);
+  padding: 28px 28px 24px;
+  position: relative;
+}
+.pl-header-close {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(255,255,255,0.1); border: none; color: rgba(255,255,255,0.6);
+  width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s;
+}
+.pl-header-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.pl-header-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3);
+  color: #FBBF24; font-size: 0.7rem; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;
+}
+.pl-header h2 {
+  font-size: 1.3rem; font-weight: 800; color: #fff;
+  margin-bottom: 6px; line-height: 1.25;
+}
+.pl-header p {
+  font-size: 0.83rem; color: rgba(255,255,255,0.55);
+  margin: 0; line-height: 1.55;
+}
+
+.pl-body { padding: 28px; }
+
+/* Lookup screen */
+.pl-screen { display: none; }
+.pl-screen.active { display: block; }
+
+.pl-field { margin-bottom: 18px; }
+.pl-field label {
+  display: block; font-size: 0.82rem; font-weight: 700;
+  color: var(--ink); margin-bottom: 6px;
+}
+.pl-field input {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  font-size: 0.95rem; color: var(--ink); background: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pl-field input:focus {
+  outline: none; border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+}
+.pl-field input.pl-error { border-color: var(--danger); }
+
+.pl-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 16px 0; color: var(--muted); font-size: 0.78rem; font-weight: 600;
+}
+.pl-divider::before, .pl-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.btn-pl-lookup {
+  width: 100%; padding: 13px;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  color: #fff; font-weight: 700; font-size: 0.95rem;
+  border: none; border-radius: var(--r-sm); cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-pl-lookup:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(13,148,136,0.3); }
+.btn-pl-lookup:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+
+.pl-status-msg {
+  display: none; border-radius: var(--r-sm);
+  padding: 12px 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.55;
+}
+.pl-status-msg.error   { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; }
+.pl-status-msg.info    { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
+.pl-status-msg.success { background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; }
+
+/* Found-client card */
+.pl-client-card {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 18px; margin-bottom: 20px;
+}
+.pl-client-card-name {
+  font-size: 1.05rem; font-weight: 800; color: var(--ink); margin-bottom: 4px;
+}
+.pl-client-card-meta {
+  font-size: 0.82rem; color: var(--slate); margin-bottom: 12px;
+}
+.pl-client-card-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.pl-client-card-status.unpaid {
+  background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;
+}
+.pl-client-card-status.paid {
+  background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0;
+}
+
+/* SunSim upsell mini inside lookup modal */
+.pl-sunsim-mini {
+  background: linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(234,88,12,0.06) 100%);
+  border: 1px solid rgba(251,191,36,0.25); border-radius: var(--r);
+  padding: 18px; margin-bottom: 18px;
+}
+.pl-sunsim-mini h4 {
+  font-size: 0.95rem; font-weight: 800; color: var(--ink); margin-bottom: 6px;
+}
+.pl-sunsim-mini p {
+  font-size: 0.82rem; color: var(--slate); line-height: 1.6; margin-bottom: 14px;
+}
+.pl-price-tag {
+  font-size: 1.5rem; font-weight: 800; color: #EA580C; margin-bottom: 14px; display: block;
+}
+.pl-price-tag span { font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+
+.btn-pl-pay {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, #FBBF24 0%, #EA580C 100%);
+  color: #0a0a0a; font-weight: 800; font-size: 1rem;
+  border: none; border-radius: var(--r-sm); cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-pl-pay:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(251,191,36,0.4); }
+.btn-pl-pay:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+.btn-pl-back {
+  width: 100%; margin-top: 10px; padding: 10px;
+  background: transparent; border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); color: var(--slate); font-weight: 600;
+  font-size: 0.88rem; cursor: pointer; transition: all 0.15s;
+}
+.btn-pl-back:hover { border-color: var(--slate); color: var(--ink); }
+
+/* Already-paid receipt inside lookup modal */
+.pl-receipt {
+  background: #ECFDF5; border: 1px solid #A7F3D0;
+  border-radius: var(--r); padding: 18px; margin-bottom: 18px;
+}
+.pl-receipt h4 {
+  font-size: 0.9rem; font-weight: 800; color: #065F46; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pl-receipt-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+  font-size: 0.82rem;
+}
+.pl-receipt-row:last-child { border: none; }
+.pl-receipt-row span:first-child { color: #047857; font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.04em; }
+.pl-receipt-row span:last-child  { color: #065F46; font-weight: 700; text-align: right; max-width: 60%; word-break: break-all; }
 </style>
 </head>
 <body>
@@ -487,7 +877,10 @@ footer {
       <div class="nav-logo-mark">☀</div>
       Solar<span>SignupNG</span>
     </div>
-    <button class="nav-cta" onclick="document.getElementById('registration').scrollIntoView({behavior:'smooth'})">Register Interest</button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="nav-pay-link" onclick="openPayLookup()">Already registered? Pay →</button>
+      <button class="nav-cta" onclick="document.getElementById('registration').scrollIntoView({behavior:'smooth'})">Register Interest</button>
+    </div>
   </div>
 </nav>
 
@@ -577,7 +970,7 @@ footer {
       <div class="hiw-apps">
         <div class="hiw-app"><span class="hiw-app-dot"></span>Solar company customer acquisition</div>
         <div class="hiw-app"><span class="hiw-app-dot"></span>Financing program design</div>
-        <div class="hiw-app"><span class="hiw-app-dot"></span>ESG & carbon credit projects</div>
+        <div class="hiw-app"><span class="hiw-app-dot"></span>ESG &amp; carbon credit projects</div>
         <div class="hiw-app"><span class="hiw-app-dot"></span>Mini-grid feasibility analysis</div>
         <div class="hiw-app"><span class="hiw-app-dot"></span>Utility rollout planning</div>
         <div class="hiw-app"><span class="hiw-app-dot"></span>Government energy policy data</div>
@@ -646,7 +1039,7 @@ footer {
         <!-- STEP 2: Location -->
         <div class="step-panel" id="step-2">
           <h3 class="step-title">Your Property Location</h3>
-          <p class="step-sub">Search your address then pin your building on the satellite map.</p>
+          <p class="step-sub">Search your address or use GPS, then click your building rooftop on the aerial map to drop a pin.</p>
 
           <div class="field">
             <label for="state">State of Residence *</label>
@@ -670,9 +1063,10 @@ footer {
 
           <input type="hidden" id="address" name="address">
 
+          <!-- ── STEP 1 of 2: Aerial Pin ── -->
           <div class="field">
-            <label>Pin Your Property on the Map *</label>
-            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:10px">Enter your address details below, click <strong>Find</strong>, then click your building rooftop on the map to drop a pin.</p>
+            <label>📍 Pin Your Property on the Aerial Map *</label>
+            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:10px">Enter your address, click <strong>Find</strong>, then click your building rooftop to drop a pin. Nigerian addresses can be tricky — just zoom in manually if needed.</p>
             <div class="map-box">
               <div class="map-search-row">
                 <input type="text" id="map-house" placeholder="No." style="max-width:70px">
@@ -697,9 +1091,9 @@ footer {
                 </div>
               </div>
               <div class="map-actions">
-                <button type="button" class="btn-confirm" id="btn-confirm-pin" onclick="confirmPin()" disabled>✓ Confirm Location</button>
+                <button type="button" class="btn-confirm" id="btn-confirm-pin" onclick="confirmPin()" disabled>✓ Confirm Aerial Pin</button>
                 <button type="button" class="btn-clear-pin" onclick="clearPin()">✕ Clear</button>
-                <span class="confirmed-badge" id="confirm-badge">✓ Saved</span>
+                <span class="confirmed-badge" id="confirm-badge">✓ Aerial pin saved</span>
               </div>
             </div>
             <p class="map-tip">
@@ -707,6 +1101,61 @@ footer {
               If your street doesn't resolve, zoom in on satellite view and click your rooftop manually.
             </p>
           </div>
+
+          <!--
+            ══════════════════════════════════════════════════════════════════════
+            STREET VIEW CONFIRMATION — NULLED OUT (No Google Maps API key yet)
+            ══════════════════════════════════════════════════════════════════════
+            This entire block is commented out until a Google Maps API key is available.
+            To re-enable:
+              1. Obtain & enable a Google Maps Embed API key in Google Cloud Console.
+              2. Set GOOGLE_MAPS_KEY variable in the <script> section below.
+              3. Un-comment this entire HTML block.
+              4. Un-comment the Street View JS functions in the <script> section.
+
+          <div class="field">
+            <label>🏠 Step 2 of 2 — Confirm Your House in Street View</label>
+            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:8px">
+              After pinning your property above, use the Street View below to confirm the building.
+            </p>
+            <div class="sv-section">
+              <div class="sv-header">
+                <div class="sv-header-left">
+                  <span class="sv-tag">🌐 Street View</span>
+                  <div>
+                    <div class="sv-title">Walk your street to confirm</div>
+                    <div class="sv-sub">Once your aerial pin is confirmed, load Street View to verify</div>
+                  </div>
+                </div>
+                <button type="button" class="btn-load-sv" id="btn-load-sv" onclick="loadStreetView()" disabled>
+                  Load Street View
+                </button>
+              </div>
+              <div id="sv-map-container">
+                <iframe id="sv-iframe" src="" allowfullscreen></iframe>
+              </div>
+              <div id="sv-placeholder" class="sv-placeholder">
+                <div class="sv-placeholder-icon">🏘️</div>
+                <div>Pin and confirm your aerial location first, then load Street View here.</div>
+              </div>
+              <div class="sv-confirm-bar" id="sv-confirm-bar">
+                <div class="sv-confirm-note">
+                  Can you see your house? Click <strong>Confirm</strong> to save, or <strong>Skip</strong> to proceed.
+                </div>
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                  <button type="button" class="btn-sv-confirm" onclick="confirmStreetView()">✓ Confirmed</button>
+                  <button type="button" class="btn-sv-skip" onclick="skipStreetView()">Skip</button>
+                </div>
+              </div>
+              <div style="padding:8px 14px;background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span class="sv-confirmed-badge" id="sv-confirmed-badge">✓ Street view confirmed</span>
+                <span id="sv-skip-note" style="font-size:0.75rem;color:var(--muted);display:none;">Street view skipped — aerial pin only.</span>
+              </div>
+            </div>
+          </div>
+          END STREET VIEW BLOCK
+          ══════════════════════════════════════════════════════════════════════
+          -->
 
           <div class="step-nav">
             <button type="button" class="btn-prev" onclick="goStep(1)">← Back</button>
@@ -716,7 +1165,7 @@ footer {
 
         <!-- STEP 3: Property -->
         <div class="step-panel" id="step-3">
-          <h3 class="step-title">Property & Electricity</h3>
+          <h3 class="step-title">Property &amp; Electricity</h3>
           <p class="step-sub">Helps us estimate your solar system size.</p>
 
           <div class="field">
@@ -773,6 +1222,22 @@ footer {
                 <option value="naira" selected>₦ Naira</option>
                 <option value="kwh">kWh</option>
               </select>
+            </div>
+            <!-- Virtual Meter Link -->
+            <div class="meter-link-box">
+              <div class="meter-link-icon">🔌</div>
+              <div class="meter-link-content">
+                <h4>Not sure of your monthly usage? Try the Virtual Power Meter</h4>
+                <p>
+                  The <strong>VirtualPowerMeterNG</strong> simulates an electricity meter so you can get familiar with how your physical prepaid meter works — helping you understand units, tariff rates, and how to read your DISCO meter at home. It won't give your exact monthly kWh directly, but it's a great tool to help you understand your meter and estimate consumption from your usage habits.
+                  <br><br>
+                  <em>Tip: Check your prepaid meter's token receipts or contact your DISCO for monthly usage history.</em>
+                </p>
+                <a href="https://cryptonian0xx.github.io/VirtualPowerMeterNG/" target="_blank" rel="noopener">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Open VirtualPowerMeterNG ↗
+                </a>
+              </div>
             </div>
           </div>
 
@@ -873,6 +1338,19 @@ footer {
   </div>
 </div>
 
+<!-- ═══════ ALREADY REGISTERED? PAY BAND ═══════ -->
+<div class="pay-band" id="pay-section">
+  <div class="pay-band-inner">
+    <div class="pay-band-text">
+      <h3>Already registered? Complete your SunSim payment.</h3>
+      <p>If you registered earlier but left before paying for your site assessment report, you can look up your registration by email or phone number and pay securely now — no need to fill the form again.</p>
+    </div>
+    <button class="btn-pay-band" onclick="openPayLookup()">
+      💳 Look Up & Pay Now
+    </button>
+  </div>
+</div>
+
 <!-- ═══════ FOOTER ═══════ -->
 <footer>
   <div class="footer-inner">
@@ -899,8 +1377,205 @@ footer {
   </div>
 </footer>
 
+
+<!-- ══════════════════════════════════════════════════════
+     PAY LOOKUP MODAL — for returning registered clients
+══════════════════════════════════════════════════════ -->
+<div class="pl-overlay" id="plModal">
+  <div class="pl-modal">
+
+    <!-- Header -->
+    <div class="pl-header">
+      <button class="pl-header-close" onclick="closePayLookup()" aria-label="Close">✕</button>
+      <div class="pl-header-badge">🔍 Registered Client</div>
+      <h2>Look up your registration &amp; pay</h2>
+      <p>Enter the email or phone number you registered with. We'll find your details and let you complete your SunSim payment.</p>
+    </div>
+
+    <div class="pl-body">
+
+      <!-- Screen 1: Lookup form -->
+      <div class="pl-screen active" id="pl-screen-lookup">
+        <div id="pl-status" class="pl-status-msg"></div>
+
+        <div class="pl-field">
+          <label for="pl-email">Email Address</label>
+          <input type="email" id="pl-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+
+        <div class="pl-divider">OR</div>
+
+        <div class="pl-field">
+          <label for="pl-phone">Phone Number</label>
+          <input type="tel" id="pl-phone" placeholder="e.g. 08012345678" autocomplete="tel">
+        </div>
+
+        <button class="btn-pl-lookup" id="btn-pl-lookup" onclick="lookupClient()">
+          🔍 Find My Registration
+        </button>
+      </div>
+
+      <!-- Screen 2a: Found — unpaid, show payment offer -->
+      <div class="pl-screen" id="pl-screen-pay">
+        <div id="pl-client-card" class="pl-client-card">
+          <!-- filled by JS -->
+        </div>
+
+        <div class="pl-sunsim-mini">
+          <h4>☀ SunSim Site Assessment Report</h4>
+          <p>Get a full professional PDF report — satellite roof tracing, shading analysis, 288 sun-position simulations, and panel placement recommendations delivered within 12–24 hours.</p>
+          <span class="pl-price-tag">₦10,000 <span>NGN · one-time</span></span>
+          <button class="btn-pl-pay" id="btn-pl-pay" onclick="initLookupPayment()">
+            🔒 Pay ₦10,000 — Get My Report
+          </button>
+        </div>
+
+        <div class="pl-secure" style="font-size:0.72rem;color:var(--muted);text-align:center;margin-bottom:12px;">
+          Secured by Paystack · Your details are never shared without consent
+        </div>
+
+        <button class="btn-pl-back" onclick="plGoScreen('lookup')">← Search Again</button>
+      </div>
+
+      <!-- Screen 2b: Found — already paid, show receipt -->
+      <div class="pl-screen" id="pl-screen-paid">
+        <div id="pl-receipt" class="pl-receipt">
+          <!-- filled by JS -->
+        </div>
+        <div style="font-size:0.85rem;color:var(--slate);line-height:1.6;margin-bottom:16px;padding:12px;background:var(--bg);border-radius:var(--r-sm);">
+          Your SunSim report should be on its way. If you haven't received it yet, please contact us referencing your payment receipt above.
+        </div>
+        <button class="btn-pl-back" onclick="plGoScreen('lookup')">← Look Up Another</button>
+      </div>
+
+      <!-- Screen 3: Not found -->
+      <div class="pl-screen" id="pl-screen-notfound">
+        <div style="text-align:center;padding:12px 0 20px;">
+          <div style="font-size:2.5rem;margin-bottom:12px;">🤔</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:8px;">No registration found</div>
+          <p style="font-size:0.85rem;color:var(--slate);line-height:1.6;margin-bottom:20px;">We couldn't find a registration matching that email or phone number. Please check the details or complete a new registration below.</p>
+          <button class="btn-pl-lookup" style="margin-bottom:10px;" onclick="closePayLookup();document.getElementById('registration').scrollIntoView({behavior:'smooth'})">
+            ☀ Register Now (Free)
+          </button>
+          <button class="btn-pl-back" onclick="plGoScreen('lookup')">← Try Different Details</button>
+        </div>
+      </div>
+
+    </div><!-- /.pl-body -->
+  </div><!-- /.pl-modal -->
+</div><!-- /.pl-overlay -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     SUNSIM UPSELL MODAL
+══════════════════════════════════════════════════════ -->
+<div class="ss-overlay" id="ssModal">
+  <div class="ss-modal">
+    <div class="ss-sun-band"></div>
+
+    <!-- Main Sales Panel -->
+    <div class="ss-body" id="ss-main-panel">
+      <div class="ss-badge">🌞 New — SunSim Developers</div>
+
+      <h2 class="ss-headline">
+        Know <em>exactly</em> where to put<br>your solar panels — before anyone<br>lifts a wrench.
+      </h2>
+
+      <p class="ss-intro">
+        Your registration has been saved! Before any solar installation can begin, you'll need a proper site assessment. SunSim Developers will fly a satellite view directly to your pinned property, trace your rooftop, map every tree and neighbouring wall that could cast shade, and simulate the sun's position for <strong style="color:#fff">every hour of every month of the year</strong> — delivering a full professional PDF report within <strong style="color:#fff">12–24 hours</strong>.
+      </p>
+
+      <div class="ss-features">
+        <div class="ss-feat">
+          <div class="ss-feat-icon">🛰️</div>
+          <div class="ss-feat-title">Satellite Roof Tracing</div>
+          <div class="ss-feat-desc">Your exact roof shape and usable area mapped from above.</div>
+        </div>
+        <div class="ss-feat">
+          <div class="ss-feat-icon">🌑</div>
+          <div class="ss-feat-title">Shading Analysis</div>
+          <div class="ss-feat-desc">Every tree, wall, and neighbouring building modelled for real shadow cast.</div>
+        </div>
+        <div class="ss-feat">
+          <div class="ss-feat-icon">☀️</div>
+          <div class="ss-feat-title">288 Sun Position Simulations</div>
+          <div class="ss-feat-desc">Hourly × monthly sun angle calculations for your exact latitude.</div>
+        </div>
+        <div class="ss-feat">
+          <div class="ss-feat-icon">📄</div>
+          <div class="ss-feat-title">Full PDF Report</div>
+          <div class="ss-feat-desc">Panel placement recommendations, peak sun hours chart &amp; shading matrix.</div>
+        </div>
+      </div>
+
+      <div class="ss-pitch">
+        <p>
+          <strong>Think about it:</strong> a wrongly-positioned solar panel array loses 20–40% of its potential output to shading alone. Every ₦1 you spend on panels placed in shadow is a ₦1 wasted. The SunSim report tells you precisely which corners of your roof get the most direct sun, which hours to avoid panel placement, and exactly what size system to specify — <strong>before you spend a kobo on hardware.</strong>
+        </p>
+        <p>
+          Installers who fly in from Lagos or abroad won't know your neighbourhood. With a SunSim report in hand, you control the conversation — armed with aerial imagery, cross-section shadow diagrams, a 12-month shading matrix, and a monthly peak sun hours chart. <strong>₦10,000 for this level of insight is genuinely the cheapest decision you'll make in your entire solar journey.</strong>
+        </p>
+      </div>
+
+      <div class="ss-price-row">
+        <div class="ss-price-left">
+          <div class="ss-price-label">One-time assessment fee</div>
+          <div class="ss-price-amount">₦10,000 <span>NGN</span></div>
+          <div class="ss-turnaround">⏱ Report delivered within 12–24 hours</div>
+        </div>
+        <button class="btn-ss-pay" id="btn-ss-pay" onclick="initSunSimPayment()">
+          🔒 Pay ₦10,000 — Get My Report
+        </button>
+      </div>
+
+      <div class="ss-skip-row">
+        <button class="btn-ss-skip" onclick="closeSunSimModal()">No thanks, skip for now</button>
+      </div>
+      <div class="ss-secure">Secured by Paystack · Your details are never shared without consent</div>
+    </div>
+
+    <!-- Success Panel (shown after payment) -->
+    <div class="ss-success" id="ss-success-panel">
+      <div class="ss-success-icon">🎉</div>
+      <div class="ss-success-title">Payment Confirmed!</div>
+      <div class="ss-success-body">
+        Your SunSim solar site assessment has been ordered. A developer will use your pinned property location to generate your full report. Expect delivery within <strong>12–24 hours</strong>.
+      </div>
+      <div class="ss-receipt-box" id="ss-receipt-box">
+        <!-- filled by JS -->
+      </div>
+      <button class="btn-ss-close" onclick="closeSunSimModal()">✓ Got it — Close</button>
+    </div>
+
+    <!-- Cancelled Panel -->
+    <div class="ss-cancelled" id="ss-cancelled-panel">
+      <div class="ss-cancelled-icon">⚠️</div>
+      <div class="ss-cancelled-title">Payment Cancelled</div>
+      <div class="ss-cancelled-body">
+        You closed the payment window. Your registration is still saved, but the SunSim report order was not placed. You can try again now or come back later.
+      </div>
+      <div class="ss-cancelled-actions">
+        <button class="btn-ss-retry" onclick="retryPayment()">↺ Try Again</button>
+        <button class="btn-ss-cancel-close" onclick="closeSunSimModal()">Skip for now</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
 <!-- ═══════ SCRIPTS ═══════ -->
 <script>
+// ══════════════════════════════════════════
+// CONFIG — update these
+// ══════════════════════════════════════════
+var PAYSTACK_KEY   = 'pk_live_bde597c1f4765fb71074669e48524b99017fc27a';
+var SUNSIM_AMOUNT  = 10000; // Naira
+var SCRIPT_URL     = 'https://script.google.com/macros/s/AKfycbz8eIPRBkBSqyLQ6tbyFdU9GUiz3IfKCYtX2w--sKJ8YfKTYB6ljOU_AZvJNdfLgMuElA/exec';
+// GOOGLE_MAPS_KEY is disabled — Street View requires a billing-enabled API key.
+// Un-comment the line below and replace the placeholder when you have a valid key:
+// var GOOGLE_MAPS_KEY = 'YOUR_GOOGLE_MAPS_API_KEY_HERE';
+
 // ══════════════════════════════════════════
 // MULTI-STEP FORM
 // ══════════════════════════════════════════
@@ -936,7 +1611,7 @@ function validateStep(n) {
   if (n === 2) {
     if (!document.getElementById('state').value) { showFieldError('state', 'Please select your state.'); ok = false; }
     if (!document.getElementById('latitude').value) {
-      msg = 'Please pin your property on the map and confirm your location.';
+      msg = 'Please pin your property on the aerial map and confirm your location.';
       ok = false;
     }
   }
@@ -991,7 +1666,7 @@ function selectCoverage(card) {
 }
 
 // ══════════════════════════════════════════
-// MAP PIN
+// MAP PIN (AERIAL)
 // ══════════════════════════════════════════
 var propMap, pinMarker;
 
@@ -1023,6 +1698,8 @@ function dropPin(lat, lng) {
   document.getElementById('latitude').value  = lat.toFixed(6);
   document.getElementById('longitude').value = lng.toFixed(6);
   document.getElementById('btn-confirm-pin').disabled = false;
+  // Reset street view state when pin moves
+  resetStreetViewState();
   if (pinMarker) { pinMarker.setLatLng([lat, lng]); }
   else {
     pinMarker = L.marker([lat, lng], { icon:pinIcon, draggable:true }).addTo(propMap);
@@ -1041,10 +1718,12 @@ function confirmPin() {
   var state  = (document.getElementById('state').value      || '').trim();
   document.getElementById('address').value = [house,street,city,state].filter(Boolean).join(', ');
   if (pinMarker) pinMarker.bindPopup('<strong>Your property</strong><br>' + lat + ', ' + lng).openPopup();
-  setHint('confirmed', '✓ Location confirmed: ' + lat + ', ' + lng);
+  setHint('confirmed', '✓ Aerial pin confirmed: ' + lat + ', ' + lng);
   var badge = document.getElementById('confirm-badge');
   badge.style.display = 'inline-flex';
   document.getElementById('btn-confirm-pin').disabled = true;
+  // Street View button unlock removed — Street View is currently disabled (no API key).
+  // When re-enabled, add: document.getElementById('btn-load-sv').disabled = false;
 }
 
 function clearPin() {
@@ -1053,6 +1732,8 @@ function clearPin() {
   document.getElementById('longitude').value = '';
   document.getElementById('btn-confirm-pin').disabled = true;
   document.getElementById('confirm-badge').style.display = 'none';
+  // Street View reset is a no-op (Street View disabled — no API key)
+  resetStreetViewState();
   setHint('idle', 'Pin cleared. Search your address or use GPS, then click your building.');
 }
 
@@ -1102,6 +1783,64 @@ function useMyGPS() {
 }
 
 // ══════════════════════════════════════════
+// STREET VIEW CONFIRMATION — NULLED OUT
+// ══════════════════════════════════════════
+// All Street View functions are disabled pending a Google Maps API key.
+// To re-enable in future:
+//   1. Obtain a billing-enabled Google Maps API key from Google Cloud Console.
+//   2. Set GOOGLE_MAPS_KEY variable at the top of this script.
+//   3. Un-comment the Street View HTML block in Step 2 of the form.
+//   4. Replace the null stubs below with the full implementations (preserved in comments).
+//
+// PRESERVED FULL IMPLEMENTATIONS (un-comment and move out when API key is ready):
+//
+// var svLoaded = false;
+//
+// function resetStreetViewState() {
+//   svLoaded = false;
+//   document.getElementById('sv-map-container').style.display = 'none';
+//   document.getElementById('sv-placeholder').style.display = 'flex';
+//   document.getElementById('sv-confirm-bar').classList.remove('visible');
+//   document.getElementById('sv-confirmed-badge').style.display = 'none';
+//   document.getElementById('sv-skip-note').style.display = 'none';
+//   document.getElementById('btn-load-sv').disabled = true;
+// }
+//
+// function loadStreetView() {
+//   var lat = document.getElementById('latitude').value;
+//   var lng = document.getElementById('longitude').value;
+//   if (!lat || !lng) return;
+//   document.getElementById('sv-placeholder').style.display = 'none';
+//   document.getElementById('sv-map-container').style.display = 'block';
+//   var svUrl = 'https://www.google.com/maps/embed/v1/streetview'
+//     + '?key=' + GOOGLE_MAPS_KEY
+//     + '&location=' + lat + ',' + lng
+//     + '&heading=0&pitch=0&fov=90';
+//   document.getElementById('sv-iframe').src = svUrl;
+//   document.getElementById('sv-confirm-bar').classList.add('visible');
+//   svLoaded = true;
+// }
+//
+// function confirmStreetView() {
+//   document.getElementById('sv-confirm-bar').classList.remove('visible');
+//   document.getElementById('sv-confirmed-badge').style.display = 'inline-flex';
+//   document.getElementById('sv-skip-note').style.display = 'none';
+// }
+//
+// function skipStreetView() {
+//   document.getElementById('sv-confirm-bar').classList.remove('visible');
+//   document.getElementById('sv-confirmed-badge').style.display = 'none';
+//   document.getElementById('sv-skip-note').style.display = 'inline';
+// }
+
+// NULL STUBS — These prevent JS errors from any residual calls
+var svLoaded = false; // kept as a harmless flag
+function resetStreetViewState() { /* no-op: Street View disabled */ }
+function loadStreetView()        { /* no-op: Street View disabled */ }
+function confirmStreetView()     { /* no-op: Street View disabled */ }
+function skipStreetView()        { /* no-op: Street View disabled */ }
+
+// ══════════════════════════════════════════
 // FORM SUBMISSION
 // ══════════════════════════════════════════
 document.getElementById('solar-registration-form').addEventListener('submit', function(e) {
@@ -1128,33 +1867,44 @@ document.getElementById('solar-registration-form').addEventListener('submit', fu
   data['Latitude']       = document.getElementById('latitude').value;
   data['Longitude']      = document.getElementById('longitude').value;
   data['Coverage Level'] = document.getElementById('coverage-level').value;
-  // Address: always build explicitly from map fields so it never arrives blank
+  data['SunSim Status']  = 'not_paid';
+
   var addrHouse  = (document.getElementById('map-house').value  || '').trim();
   var addrStreet = (document.getElementById('map-street').value || '').trim();
   var addrCity   = (document.getElementById('map-city').value   || '').trim();
   var addrState  = (document.getElementById('state').value      || '').trim();
   data['Address'] = [addrHouse, addrStreet, addrCity, addrState].filter(Boolean).join(', ');
 
-  var scriptURL = 'https://script.google.com/macros/s/AKfycbz8eIPRBkBSqyLQ6tbyFdU9GUiz3IfKCYtX2w--sKJ8YfKTYB6ljOU_AZvJNdfLgMuElA/exec';
-  fetch(scriptURL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data).toString() })
+  // Store for SunSim payment context
+  window._registrantData = {
+    name: data['Full Name'] || '',
+    email: data['Email'] || '',
+    phone: data['Phone'] || '',
+    lat: data['Latitude'],
+    lng: data['Longitude'],
+    address: data['Address'],
+    state: data['State'] || ''
+  };
+
+  fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data).toString() })
     .then(function(){
-      var s = document.getElementById('form-status');
-      s.className = 'status-msg success'; s.style.display = 'block';
-      s.innerHTML = '<h4>🎉 Registration Submitted!</h4><p>Thank you for joining Nigeria\'s Solar Demand Registry. Solar providers may contact you soon to discuss options for your property.</p>';
+      btn.disabled=false; btn.textContent='☀ Submit My Solar Registration';
       document.getElementById('solar-registration-form').reset();
-      clearPin(); propMap.setView([9.082,8.6753],6);
+      clearPin();
+      if (propMap) propMap.setView([9.082,8.6753],6);
       document.querySelectorAll('.cov-card').forEach(function(c){ c.classList.remove('selected'); });
       document.getElementById('coverage-level').value = '';
       document.querySelectorAll('.radio-card').forEach(function(c){ c.classList.remove('selected'); });
       goStep(1);
-      s.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      // Show SunSim upsell modal
+      showSunSimModal();
     })
     .catch(function(){
       var s = document.getElementById('form-status');
       s.className = 'status-msg error'; s.style.display = 'block';
       s.innerHTML = '<p>Submission failed. Please check your connection and try again.</p>';
-    })
-    .finally(function(){ btn.disabled=false; btn.textContent='☀ Submit My Solar Registration'; });
+      btn.disabled=false; btn.textContent='☀ Submit My Solar Registration';
+    });
 });
 
 // Phone validation
@@ -1167,6 +1917,374 @@ document.getElementById('solar-registration-form').addEventListener('submit', fu
     } else { this.classList.remove('error'); }
   });
 });
+
+// ══════════════════════════════════════════
+// SUNSIM MODAL
+// ══════════════════════════════════════════
+function showSunSimModal() {
+  document.getElementById('ss-main-panel').style.display = 'block';
+  document.getElementById('ss-success-panel').style.display = 'none';
+  document.getElementById('ss-cancelled-panel').style.display = 'none';
+  document.getElementById('ssModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSunSimModal() {
+  document.getElementById('ssModal').classList.remove('active');
+  document.body.style.overflow = '';
+
+  // Show registration success message after modal closes
+  var s = document.getElementById('form-status');
+  s.className = 'status-msg success'; s.style.display = 'block';
+  s.innerHTML = '<h4>🎉 Registration Submitted!</h4><p>Thank you for joining Nigeria\'s Solar Demand Registry. Solar providers may contact you soon to discuss options for your property.</p>';
+  document.getElementById('registration').scrollIntoView({ behavior:'smooth' });
+}
+
+function retryPayment() {
+  document.getElementById('ss-cancelled-panel').style.display = 'none';
+  document.getElementById('ss-main-panel').style.display = 'block';
+}
+
+// ══════════════════════════════════════════
+// SUNSIM PAYSTACK PAYMENT
+// ══════════════════════════════════════════
+function initSunSimPayment() {
+  var d = window._registrantData || {};
+  var email = d.email || '';
+
+  // Need at least an email for Paystack — use a fallback if not provided
+  if (!email) {
+    // Prompt gently
+    email = window.prompt('Please enter your email address to proceed with payment:');
+    if (!email || !email.includes('@')) {
+      alert('A valid email is required to process the payment.');
+      return;
+    }
+    window._registrantData.email = email;
+  }
+
+  var payBtn = document.getElementById('btn-ss-pay');
+  payBtn.disabled = true;
+  payBtn.innerHTML = '⏳ Opening payment…';
+
+  var reference = 'SUNSIM-' + Date.now() + '-' + Math.random().toString(36).substring(2,8).toUpperCase();
+  window._sunSimRef = reference;
+
+  var handler = PaystackPop.setup({
+    key:      PAYSTACK_KEY,
+    email:    email,
+    amount:   SUNSIM_AMOUNT * 100,
+    currency: 'NGN',
+    ref:      reference,
+    metadata: {
+      custom_fields: [
+        { display_name:'Customer Name', variable_name:'customer_name', value: d.name || '' },
+        { display_name:'Phone',         variable_name:'phone',         value: d.phone || '' },
+        { display_name:'Property Lat',  variable_name:'latitude',      value: d.lat || '' },
+        { display_name:'Property Lng',  variable_name:'longitude',     value: d.lng || '' },
+        { display_name:'Product',       variable_name:'product',       value: 'SunSim Site Assessment Report' }
+      ]
+    },
+    callback: function(response) {
+      payBtn.disabled = false;
+      payBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
+      onSunSimPaymentSuccess(response.reference);
+    },
+    onClose: function() {
+      payBtn.disabled = false;
+      payBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
+      document.getElementById('ss-main-panel').style.display = 'none';
+      document.getElementById('ss-cancelled-panel').style.display = 'block';
+    }
+  });
+
+  handler.openIframe();
+}
+
+function onSunSimPaymentSuccess(reference) {
+  var d = window._registrantData || {};
+  var now = new Date();
+  var receiptData = {
+    timestamp:       now.toISOString(),
+    name:            d.name || '—',
+    email:           d.email || '—',
+    phone:           d.phone || '—',
+    address:         d.address || '—',
+    latitude:        d.lat || '—',
+    longitude:       d.lng || '—',
+    product:         'SunSim Site Assessment Report',
+    amount:          SUNSIM_AMOUNT,
+    reference:       reference,
+    payment_status:  'paid',
+    payment_date:    now.toISOString(),
+    sunsim_status:   'paid',
+    receipt_ref:     reference
+  };
+
+  // Log paid status + receipt to Google Sheet
+  logToSheet(receiptData);
+
+  // Show success panel
+  document.getElementById('ss-main-panel').style.display = 'none';
+  document.getElementById('ss-cancelled-panel').style.display = 'none';
+
+  var receiptBox = document.getElementById('ss-receipt-box');
+  receiptBox.innerHTML = [
+    row('Customer', d.name || '—'),
+    row('Email', d.email || '—'),
+    row('Phone', d.phone || '—'),
+    row('Property', d.lat + ', ' + d.lng),
+    row('Product', 'SunSim Site Assessment'),
+    row('Amount', '₦' + SUNSIM_AMOUNT.toLocaleString()),
+    row('Receipt Ref', reference),
+    row('Status', '✓ Paid')
+  ].join('');
+
+  document.getElementById('ss-success-panel').style.display = 'block';
+}
+
+function row(label, value) {
+  return '<div class="ss-receipt-row"><span>' + label + '</span><span>' + value + '</span></div>';
+}
+
+function logToSheet(data) {
+  if (!SCRIPT_URL) return;
+  try {
+    var params = new URLSearchParams(data);
+    fetch(SCRIPT_URL + '?' + params.toString(), { method:'GET', mode:'no-cors' });
+  } catch(e) {
+    console.warn('Sheet log error:', e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PAY LOOKUP MODAL — Returning registered clients
+// ══════════════════════════════════════════════════════════════
+
+// Holds the found client's data from the sheet lookup
+var _lookupClient = null;
+
+function openPayLookup() {
+  plGoScreen('lookup');
+  plSetStatus('', '');
+  document.getElementById('pl-email').value = '';
+  document.getElementById('pl-phone').value = '';
+  document.getElementById('pl-email').classList.remove('pl-error');
+  document.getElementById('pl-phone').classList.remove('pl-error');
+  document.getElementById('plModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePayLookup() {
+  document.getElementById('plModal').classList.remove('active');
+  document.body.style.overflow = '';
+  _lookupClient = null;
+}
+
+// Allow pressing Enter in lookup fields to trigger search
+document.addEventListener('DOMContentLoaded', function() {
+  ['pl-email','pl-phone'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); lookupClient(); }
+    });
+  });
+});
+
+function plGoScreen(name) {
+  document.querySelectorAll('.pl-screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('pl-screen-' + name).classList.add('active');
+}
+
+function plSetStatus(type, msg) {
+  var el = document.getElementById('pl-status');
+  if (!type) { el.style.display = 'none'; el.textContent = ''; return; }
+  el.className = 'pl-status-msg ' + type;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+}
+
+function lookupClient() {
+  var email = (document.getElementById('pl-email').value || '').trim().toLowerCase();
+  var phone = (document.getElementById('pl-phone').value || '').trim().replace(/\s/g, '');
+
+  // Validate: need at least one identifier
+  if (!email && !phone) {
+    plSetStatus('error', 'Please enter your email address <strong>or</strong> phone number to search.');
+    document.getElementById('pl-email').classList.add('pl-error');
+    document.getElementById('pl-phone').classList.add('pl-error');
+    return;
+  }
+  document.getElementById('pl-email').classList.remove('pl-error');
+  document.getElementById('pl-phone').classList.remove('pl-error');
+
+  var btn = document.getElementById('btn-pl-lookup');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Searching…';
+  plSetStatus('info', '🔍 Looking up your registration…');
+
+  // Build lookup URL — AppScript doGet with action=lookup
+  var params = new URLSearchParams({ action: 'lookup' });
+  if (email) params.append('email', email);
+  if (phone) params.append('phone', phone);
+
+  fetch(SCRIPT_URL + '?' + params.toString(), { method: 'GET' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      btn.disabled = false;
+      btn.innerHTML = '🔍 Find My Registration';
+
+      if (data.result === 'found') {
+        _lookupClient = data.client;
+        showLookupResult(data.client);
+      } else if (data.result === 'not_found') {
+        plSetStatus('', '');
+        plGoScreen('notfound');
+      } else {
+        plSetStatus('error', 'Something went wrong: ' + (data.error || 'Unknown error. Please try again.'));
+      }
+    })
+    .catch(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = '🔍 Find My Registration';
+      plSetStatus('error', '⚠ Could not connect to the server. Please check your internet connection and try again.');
+      console.warn('Lookup error:', err);
+    });
+}
+
+function showLookupResult(client) {
+  var isPaid = (client.sunsimStatus || '').toLowerCase().indexOf('paid') !== -1;
+
+  // Build the client info card (shown on both screens)
+  var cardHtml = '<div class="pl-client-card-name">👤 ' + escHtml(client.name || 'Registered Client') + '</div>'
+    + '<div class="pl-client-card-meta">'
+    + (client.phone ? '📞 ' + escHtml(client.phone) + ' &nbsp;' : '')
+    + (client.email ? '✉ ' + escHtml(client.email) : '')
+    + '</div>'
+    + '<span class="pl-client-card-status ' + (isPaid ? 'paid' : 'unpaid') + '">'
+    + (isPaid ? '✓ SunSim Paid' : '⏳ SunSim Not Yet Paid')
+    + '</span>';
+
+  if (isPaid) {
+    // Show the receipt screen
+    document.getElementById('pl-receipt').innerHTML = '<h4>✅ Payment Already Received</h4>'
+      + plReceiptRow('Name',      client.name     || '—')
+      + plReceiptRow('Phone',     client.phone    || '—')
+      + plReceiptRow('Email',     client.email    || '—')
+      + plReceiptRow('State',     client.state    || '—')
+      + plReceiptRow('Product',   'SunSim Site Assessment')
+      + plReceiptRow('Status',    client.sunsimStatus || 'paid');
+    plGoScreen('paid');
+  } else {
+    // Show the pay screen
+    document.getElementById('pl-client-card').innerHTML = cardHtml;
+    document.getElementById('btn-pl-pay').disabled = false;
+    document.getElementById('btn-pl-pay').innerHTML = '🔒 Pay ₦10,000 — Get My Report';
+    plSetStatus('', '');
+    plGoScreen('pay');
+  }
+}
+
+function plReceiptRow(label, value) {
+  return '<div class="pl-receipt-row"><span>' + escHtml(label) + '</span><span>' + escHtml(value) + '</span></div>';
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Paystack payment triggered from the lookup modal ──────────
+function initLookupPayment() {
+  if (!_lookupClient) return;
+  var d = _lookupClient;
+
+  var email = d.email || '';
+  if (!email) {
+    email = window.prompt('Please enter your email address to proceed with payment:');
+    if (!email || !email.includes('@')) {
+      alert('A valid email is required to process the payment.');
+      return;
+    }
+    _lookupClient.email = email;
+  }
+
+  var payBtn = document.getElementById('btn-pl-pay');
+  payBtn.disabled = true;
+  payBtn.innerHTML = '⏳ Opening payment…';
+
+  var reference = 'SUNSIM-' + Date.now() + '-' + Math.random().toString(36).substring(2,8).toUpperCase();
+
+  var handler = PaystackPop.setup({
+    key:      PAYSTACK_KEY,
+    email:    email,
+    amount:   SUNSIM_AMOUNT * 100,
+    currency: 'NGN',
+    ref:      reference,
+    metadata: {
+      custom_fields: [
+        { display_name:'Customer Name', variable_name:'customer_name', value: d.name  || '' },
+        { display_name:'Phone',         variable_name:'phone',         value: d.phone || '' },
+        { display_name:'Property Lat',  variable_name:'latitude',      value: d.lat   || '' },
+        { display_name:'Property Lng',  variable_name:'longitude',     value: d.lng   || '' },
+        { display_name:'Product',       variable_name:'product',       value: 'SunSim Site Assessment Report' },
+        { display_name:'Source',        variable_name:'source',        value: 'lookup_modal' }
+      ]
+    },
+    callback: function(response) {
+      payBtn.disabled = false;
+      payBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
+      onLookupPaymentSuccess(response.reference);
+    },
+    onClose: function() {
+      payBtn.disabled = false;
+      payBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
+      plSetStatus('info', '⚠ Payment window closed. Your registration is still saved — you can pay anytime.');
+    }
+  });
+
+  handler.openIframe();
+}
+
+function onLookupPaymentSuccess(reference) {
+  var d = _lookupClient || {};
+  var now = new Date();
+
+  // Log the paid payment to the sheet (same as main flow)
+  var receiptData = {
+    timestamp:       now.toISOString(),
+    name:            d.name    || '',
+    email:           d.email   || '',
+    phone:           d.phone   || '',
+    address:         d.address || '',
+    latitude:        d.lat     || '',
+    longitude:       d.lng     || '',
+    product:         'SunSim Site Assessment Report',
+    amount:          SUNSIM_AMOUNT,
+    reference:       reference,
+    payment_status:  'paid',
+    payment_date:    now.toISOString(),
+    sunsim_status:   'paid',
+    receipt_ref:     reference,
+    source:          'lookup_modal'
+  };
+  logToSheet(receiptData);
+
+  // Show a paid receipt inside the lookup modal
+  document.getElementById('pl-receipt').innerHTML =
+    '<h4>🎉 Payment Confirmed!</h4>'
+    + plReceiptRow('Name',      d.name  || '—')
+    + plReceiptRow('Email',     d.email || '—')
+    + plReceiptRow('Phone',     d.phone || '—')
+    + plReceiptRow('Product',   'SunSim Site Assessment')
+    + plReceiptRow('Amount',    '₦' + SUNSIM_AMOUNT.toLocaleString())
+    + plReceiptRow('Ref',       reference)
+    + plReceiptRow('Status',    '✓ Paid');
+
+  plGoScreen('paid');
+}
+
 </script>
 </body>
 </html>
