@@ -329,7 +329,7 @@ nav {
   transition:all 0.15s;
 }
 .btn-gps:hover { background:var(--teal); color:#fff; }
-#property-map { width:100%; height:300px; cursor:crosshair; }
+#property-map { width:100%; height:340px; cursor:crosshair; }
 .map-status-bar {
   padding:9px 14px; font-size:0.8rem; font-weight:500;
   display:flex; align-items:center; gap:8px; border-top:1px solid var(--border);
@@ -340,6 +340,14 @@ nav {
 .map-status-bar.confirmed { background:#ECFDF5; color:#065F46; }
 .status-pulse { width:7px; height:7px; border-radius:50%; background:currentColor; flex-shrink:0; }
 .map-status-bar.searching .status-pulse { animation:blink 1s infinite; }
+/* Zoom notice overlay */
+.map-zoom-notice {
+  display:none; position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+  background:rgba(15,23,42,0.82); color:#fff; font-size:0.73rem; font-weight:600;
+  padding:4px 12px; border-radius:20px; white-space:nowrap; z-index:500;
+  pointer-events:none; letter-spacing:0.02em;
+}
+.map-zoom-notice.visible { display:block; }
 .latlong-row {
   display:grid; grid-template-columns:1fr 1fr; gap:10px;
   padding:10px 12px; border-top:1px solid var(--border); background:var(--bg);
@@ -1075,7 +1083,9 @@ footer {
                 <button type="button" class="btn-search" onclick="searchAddress()">🔍 Find</button>
                 <button type="button" class="btn-gps" onclick="useMyGPS()">📍 GPS</button>
               </div>
-              <div id="property-map"></div>
+              <div id="property-map" style="position:relative;">
+                <div class="map-zoom-notice" id="map-zoom-notice"></div>
+              </div>
               <div class="map-status-bar idle" id="map-hint">
                 <span class="status-pulse"></span>
                 <span id="map-hint-text">Enter your address and click Find, or tap GPS. Then click your building to drop a pin.</span>
@@ -1098,7 +1108,7 @@ footer {
             </div>
             <p class="map-tip">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              If your street doesn't resolve, zoom in on satellite view and click your rooftop manually.
+              If your street doesn't resolve, zoom in on satellite view and click your rooftop manually. At very close zoom the satellite image may look blurry — that's normal upscaling, not a broken map. Drop the pin anyway.
             </p>
           </div>
 
@@ -1442,10 +1452,15 @@ footer {
         <div id="pl-receipt" class="pl-receipt">
           <!-- filled by JS -->
         </div>
-        <div style="font-size:0.85rem;color:var(--slate);line-height:1.6;margin-bottom:16px;padding:12px;background:var(--bg);border-radius:var(--r-sm);">
+        <div id="pl-paid-note" style="font-size:0.85rem;color:var(--slate);line-height:1.6;margin-bottom:16px;padding:12px;background:var(--bg);border-radius:var(--r-sm);">
           Your SunSim report should be on its way. If you haven't received it yet, please contact us referencing your payment receipt above.
         </div>
-        <button class="btn-pl-back" onclick="plGoScreen('lookup')">← Look Up Another</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn-pl-back" style="flex:1;margin-top:0;" onclick="plGoScreen('lookup')">← Look Up Another</button>
+          <button class="btn-pl-pay" id="btn-pl-pay-receipt" style="flex:2;display:none;" onclick="initLookupPayment()">
+            🔒 Pay ₦10,000 — Get My Report
+          </button>
+        </div>
       </div>
 
       <!-- Screen 3: Not found -->
@@ -1679,14 +1694,68 @@ var pinIcon = L.divIcon({
 });
 
 window.addEventListener('load', function() {
-  propMap = L.map('property-map', { zoomControl:true }).setView([9.082, 8.6753], 6);
+  propMap = L.map('property-map', { zoomControl:true, preferCanvas:true }).setView([9.082, 8.6753], 6);
+
+  // Satellite: Esri World Imagery with maxNativeZoom=19 to prevent blank tiles at high zoom
+  // At zoom 20+, Leaflet will upscale z=19 tiles rather than requesting missing z=20/21 tiles
   var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    { attribution:'Tiles © Esri', maxZoom:21 });
+    {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+      maxZoom: 21,
+      maxNativeZoom: 19,   // tiles only exist up to z=19; Leaflet upscales beyond that
+      tileSize: 256,
+      crossOrigin: true
+    }
+  );
+
+  // Fallback satellite: Google-compatible via Esri World Imagery Labels overlay
+  var satLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: '',
+      maxZoom: 21,
+      maxNativeZoom: 19,
+      tileSize: 256,
+      crossOrigin: true,
+      opacity: 0.7
+    }
+  );
+
   var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    { attribution:'© OpenStreetMap', maxZoom:19 });
+    {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+      maxNativeZoom: 19,
+      crossOrigin: true
+    }
+  );
+
+  // Handle tile errors gracefully — show hint instead of broken tile icons
+  sat.on('tileerror', function(e) {
+    // silently suppress — maxNativeZoom handles most cases, this is a safety net
+  });
+
   sat.addTo(propMap);
-  L.control.layers({'Satellite':sat,'Street map':osm},{},{position:'topright'}).addTo(propMap);
+
+  // Layer control: satellite with optional label overlay, plus street map
+  var baseLayers  = { 'Satellite': sat, 'Street map': osm };
+  var overlays    = { 'Place labels': satLabels };
+  L.control.layers(baseLayers, overlays, { position:'topright' }).addTo(propMap);
+
   propMap.on('click', function(e){ dropPin(e.latlng.lat, e.latlng.lng); });
+
+  // Let users know when they're at max native zoom (tiles upscale, not "unavailable")
+  propMap.on('zoomend', function() {
+    var z = propMap.getZoom();
+    var notice = document.getElementById('map-zoom-notice');
+    if (notice) {
+      if (z >= 19) {
+        notice.textContent = z >= 20 ? '🔍 Max zoom — image is being upscaled' : '🔍 Near max zoom — click to drop a pin';
+        notice.classList.add('visible');
+      } else {
+        notice.classList.remove('visible');
+      }
+    }
+  });
   ['map-house','map-street','map-city'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.addEventListener('keydown', function(e){ if(e.key==='Enter'){e.preventDefault();searchAddress();} });
@@ -1743,33 +1812,148 @@ function setHint(type, msg) {
   document.getElementById('map-hint-text').textContent = msg;
 }
 
+// ── Address search helpers ──────────────────────────────────────
+// Nominatim structured search (most accurate when OSM has the road)
+function _nominatimFetch(params) {
+  var base = 'https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=ng&addressdetails=1&';
+  return fetch(base + new URLSearchParams(params).toString(), {
+    headers: { 'Accept-Language': 'en', 'User-Agent': 'SolarSignupNG/7' }
+  }).then(function(r){ return r.json(); });
+}
+
+// Photon geocoder (uses OpenStreetMap data, different index — often finds what Nominatim misses)
+function _photonFetch(q) {
+  return fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&limit=3&lang=en&bbox=2.5,4.0,15.0,14.0')
+    .then(function(r){ return r.json(); })
+    .then(function(fc){
+      // normalise to Nominatim-like objects
+      if (!fc || !fc.features || !fc.features.length) return [];
+      return fc.features.map(function(f){
+        return {
+          lat:  String(f.geometry.coordinates[1]),
+          lon:  String(f.geometry.coordinates[0]),
+          type: f.properties.type || 'place',
+          display_name: [
+            f.properties.name,
+            f.properties.street,
+            f.properties.city,
+            f.properties.state,
+            'Nigeria'
+          ].filter(Boolean).join(', ')
+        };
+      });
+    });
+}
+
+// Score a result — prefer results that are close/specific
+function _bestResult(results) {
+  if (!results || !results.length) return null;
+  // Prefer house/building > road > suburb/neighbourhood > place
+  var rank = { house:5, building:5, road:4, residential:3, suburb:2, neighbourhood:2, town:1, city:0, place:0 };
+  results.sort(function(a,b){ return (rank[b.type]||0) - (rank[a.type]||0); });
+  return results[0];
+}
+
 function searchAddress() {
   var house  = (document.getElementById('map-house').value  || '').trim();
   var street = (document.getElementById('map-street').value || '').trim();
   var city   = (document.getElementById('map-city').value   || '').trim();
   var state  = (document.getElementById('state').value      || '').trim();
-  if (!street && !city) { setHint('pinned', 'Please enter at least a street or city.'); return; }
-  var parts = [house,street,city,state,'Nigeria'].filter(Boolean);
-  setHint('searching', 'Searching for "' + parts.join(', ') + '"…');
-  var q = encodeURIComponent(parts.join(', '));
-  fetch('https://nominatim.openstreetmap.org/search?q='+q+'&format=json&limit=1&countrycodes=ng')
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (data && data.length) {
-        var z = (data[0].type==='house'||data[0].type==='building') ? 19 : data[0].type==='road' ? 18 : 17;
-        propMap.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], z);
-        setHint('searching', 'Found: ' + data[0].display_name.split(',').slice(0,3).join(', ') + '. Click your building to pin it.');
+
+  if (!street && !city) {
+    setHint('pinned', 'Please enter at least a street name or city/area.');
+    return;
+  }
+
+  // Build a human-readable label for the status bar
+  var displayLabel = [house, street, city, state].filter(Boolean).join(', ');
+  setHint('searching', 'Searching for "' + displayLabel + '"…');
+
+  // ── Strategy 1: Nominatim structured query ────────────────────
+  var structuredParams = { countrycodes:'ng' };
+  if (house)  structuredParams.housenumber = house;
+  if (street) structuredParams.street      = street;
+  if (city)   structuredParams.city        = city;
+  if (state)  structuredParams.state       = state;
+  structuredParams.country = 'Nigeria';
+
+  // ── Strategy 2: Nominatim free-form (street + area) ──────────
+  var freeQuery1 = [house, street, city, state, 'Nigeria'].filter(Boolean).join(', ');
+
+  // ── Strategy 3: Nominatim free-form without house number ─────
+  var freeQuery2 = [street, city, state, 'Nigeria'].filter(Boolean).join(', ');
+
+  // ── Strategy 4: City/LGA only ─────────────────────────────────
+  var cityQuery  = [city, state, 'Nigeria'].filter(Boolean).join(', ');
+
+  // ── Strategy 5: Photon (different index, good for Nigerian streets) ──
+  var photonQuery = [street, city, state, 'Nigeria'].filter(Boolean).join(' ');
+
+  // Run strategies in sequence, stopping at first good result
+  _nominatimFetch(structuredParams)
+    .then(function(r1) {
+      var best = _bestResult(r1);
+      if (best) return best;
+
+      // S2: Nominatim free-form with house
+      return _nominatimFetch({ q: freeQuery1 })
+        .then(function(r2) {
+          var best2 = _bestResult(r2);
+          if (best2) return best2;
+
+          // S3: Nominatim free-form without house
+          return _nominatimFetch({ q: freeQuery2 })
+            .then(function(r3) {
+              var best3 = _bestResult(r3);
+              if (best3) return best3;
+
+              // S4: Photon geocoder
+              return _photonFetch(photonQuery)
+                .then(function(r4) {
+                  var best4 = _bestResult(r4);
+                  if (best4) return best4;
+
+                  // S5: City/LGA fallback (zoom out a bit)
+                  return _nominatimFetch({ q: cityQuery })
+                    .then(function(r5) { return _bestResult(r5) || null; });
+                });
+            });
+        });
+    })
+    .then(function(result) {
+      if (!result) {
+        setHint('pinned', 'Address not found in any database. Zoom into the map manually and click your building.');
+        return;
+      }
+
+      var lat = parseFloat(result.lat);
+      var lon = parseFloat(result.lon);
+
+      // Choose zoom level based on how specific the result is
+      var typeZoom = {
+        house: 19, building: 19, road: 18, residential: 17,
+        suburb: 16, neighbourhood: 16, town: 15, city: 14, place: 13
+      };
+      var z = typeZoom[result.type] || 16;
+
+      // If we only matched at city level, show a different hint
+      var isCityLevel = (z <= 14);
+      propMap.setView([lat, lon], z);
+
+      if (isCityLevel) {
+        setHint('searching',
+          'Showing area: ' + result.display_name.split(',').slice(0,2).join(', ') +
+          '. Zoom in and click your building to pin it.');
       } else {
-        var broad = encodeURIComponent([city,state,'Nigeria'].filter(Boolean).join(', '));
-        fetch('https://nominatim.openstreetmap.org/search?q='+broad+'&format=json&limit=1&countrycodes=ng')
-          .then(function(r){ return r.json(); })
-          .then(function(d2){
-            if (d2 && d2.length) { propMap.setView([parseFloat(d2[0].lat),parseFloat(d2[0].lon)],14); setHint('searching','Showing '+(city||state)+' — zoom in and click your building.'); }
-            else setHint('pinned','Address not found. Scroll and zoom the map manually.');
-          });
+        setHint('searching',
+          'Found: ' + result.display_name.split(',').slice(0,3).join(', ') +
+          '. Click your building rooftop to pin it.');
       }
     })
-    .catch(function(){ setHint('pinned','Search failed. Try the GPS button or scroll the map manually.'); });
+    .catch(function(err) {
+      console.warn('Geocode error:', err);
+      setHint('pinned', 'Search failed. Try the GPS button, or zoom and click the map manually.');
+    });
 }
 
 function useMyGPS() {
@@ -2153,7 +2337,9 @@ function lookupClient() {
 }
 
 function showLookupResult(client) {
-  var isPaid = (client.sunsimStatus || '').toLowerCase().indexOf('paid') !== -1;
+  // Fix: 'not_paid' contains 'paid' as a substring — must check for exact 'paid' only
+  var statusRaw = (client.sunsimStatus || '').toLowerCase().trim();
+  var isPaid = (statusRaw === 'paid');
 
   // Build the client info card (shown on both screens)
   var cardHtml = '<div class="pl-client-card-name">👤 ' + escHtml(client.name || 'Registered Client') + '</div>'
@@ -2166,7 +2352,7 @@ function showLookupResult(client) {
     + '</span>';
 
   if (isPaid) {
-    // Show the receipt screen
+    // Show the receipt screen — payment confirmed, hide pay button
     document.getElementById('pl-receipt').innerHTML = '<h4>✅ Payment Already Received</h4>'
       + plReceiptRow('Name',      client.name     || '—')
       + plReceiptRow('Phone',     client.phone    || '—')
@@ -2174,6 +2360,8 @@ function showLookupResult(client) {
       + plReceiptRow('State',     client.state    || '—')
       + plReceiptRow('Product',   'SunSim Site Assessment')
       + plReceiptRow('Status',    client.sunsimStatus || 'paid');
+    document.getElementById('pl-paid-note').textContent = 'Your SunSim report should be on its way. If you haven\'t received it yet, please contact us referencing your payment receipt above.';
+    document.getElementById('btn-pl-pay-receipt').style.display = 'none';
     plGoScreen('paid');
   } else {
     // Show the pay screen
@@ -2210,9 +2398,13 @@ function initLookupPayment() {
     _lookupClient.email = email;
   }
 
+  // Support being called from either the pay screen or the receipt screen pay button
   var payBtn = document.getElementById('btn-pl-pay');
-  payBtn.disabled = true;
-  payBtn.innerHTML = '⏳ Opening payment…';
+  var payBtnReceipt = document.getElementById('btn-pl-pay-receipt');
+  // Disable whichever button is currently visible
+  var activeBtn = (payBtnReceipt && payBtnReceipt.style.display !== 'none') ? payBtnReceipt : payBtn;
+  activeBtn.disabled = true;
+  activeBtn.innerHTML = '⏳ Opening payment…';
 
   var reference = 'SUNSIM-' + Date.now() + '-' + Math.random().toString(36).substring(2,8).toUpperCase();
 
@@ -2233,13 +2425,13 @@ function initLookupPayment() {
       ]
     },
     callback: function(response) {
-      payBtn.disabled = false;
-      payBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
+      activeBtn.disabled = false;
+      activeBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
       onLookupPaymentSuccess(response.reference);
     },
     onClose: function() {
-      payBtn.disabled = false;
-      payBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
+      activeBtn.disabled = false;
+      activeBtn.innerHTML = '🔒 Pay ₦10,000 — Get My Report';
       plSetStatus('info', '⚠ Payment window closed. Your registration is still saved — you can pay anytime.');
     }
   });
