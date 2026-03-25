@@ -652,6 +652,190 @@ footer {
   .form-step-tab { border-radius:var(--r-sm); text-align:left; }
 }
 
+/* ═══════════════════════════ PARTNER SECTIONS ═══════════════════════════ */
+
+/* Shared two-column partner layout */
+.partner-section { padding: 90px 0; }
+.partner-section.companies-bg {
+  background: var(--bg);
+}
+.partner-section.developers-bg {
+  background: var(--ink2);
+}
+.partner-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 24px;
+}
+.partner-split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+}
+.partner-split.reverse { direction: rtl; }
+.partner-split.reverse > * { direction: ltr; }
+
+/* Icon badge */
+.partner-icon-wrap {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 20px; flex-shrink: 0;
+}
+.partner-icon-wrap.orange { background: var(--sun-light); }
+.partner-icon-wrap.dark   { background: rgba(251,191,36,0.12); }
+
+/* Text side */
+.partner-label {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 10px;
+}
+.partner-label.teal  { color: var(--teal); }
+.partner-label.gold  { color: #FBBF24; }
+
+.partner-heading {
+  font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+  font-weight: 800; line-height: 1.2; margin-bottom: 16px;
+}
+.partner-heading.dark-text { color: var(--ink); }
+.partner-heading.light-text { color: #fff; }
+.partner-heading em { font-style: normal; }
+.partner-heading.dark-text em  { color: var(--teal); }
+.partner-heading.light-text em { color: #FBBF24; }
+
+.partner-lead {
+  font-size: 1.02rem; line-height: 1.75; margin-bottom: 28px;
+}
+.partner-lead.dark-text  { color: var(--slate); }
+.partner-lead.light-text { color: rgba(255,255,255,0.65); }
+
+/* Feature list */
+.partner-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 14px; }
+.partner-features li {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 0.92rem; line-height: 1.6;
+}
+.partner-features li .pf-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0; margin-top: 1px;
+}
+.partner-features.light li .pf-icon { background: var(--teal-light); }
+.partner-features.dark  li .pf-icon { background: rgba(251,191,36,0.12); }
+.partner-features.light li strong { color: var(--ink); font-weight: 700; display: block; margin-bottom: 1px; }
+.partner-features.light li span   { color: var(--slate); font-size: 0.86rem; }
+.partner-features.dark  li strong { color: #fff; font-weight: 700; display: block; margin-bottom: 1px; }
+.partner-features.dark  li span   { color: rgba(255,255,255,0.5); font-size: 0.86rem; }
+
+/* CTA buttons */
+.btn-partner-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 26px; border-radius: 50px; border: none;
+  font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s; text-decoration: none;
+}
+.btn-partner-primary.teal-btn {
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  color: #fff;
+}
+.btn-partner-primary.teal-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(13,148,136,0.35); }
+.btn-partner-primary.gold-btn {
+  background: linear-gradient(135deg, #FBBF24 0%, #EA580C 100%);
+  color: #0a0a0a;
+}
+.btn-partner-primary.gold-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(251,191,36,0.4); }
+
+.btn-partner-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px; border-radius: 50px;
+  font-weight: 600; font-size: 0.88rem; cursor: pointer;
+  transition: all 0.15s; text-decoration: none; margin-left: 12px;
+}
+.btn-partner-secondary.teal-outline {
+  background: transparent; color: var(--teal);
+  border: 1.5px solid var(--teal);
+}
+.btn-partner-secondary.teal-outline:hover { background: var(--teal); color: #fff; }
+.btn-partner-secondary.ghost-light {
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7);
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+.btn-partner-secondary.ghost-light:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+.partner-cta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+/* Visual card side */
+.partner-visual { position: relative; }
+
+/* Companies visual — stacked report cards */
+.pc-report-stack { position: relative; height: 340px; }
+.pc-report-card {
+  position: absolute; background: var(--surface);
+  border-radius: var(--r); border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg); padding: 20px 22px;
+}
+.pc-report-card.back {
+  width: 88%; left: 6%; top: 0;
+  transform: rotate(-3deg);
+  background: #f0fdf4; border-color: #bbf7d0;
+}
+.pc-report-card.front {
+  width: 88%; left: 6%; top: 36px;
+  transform: rotate(1.5deg);
+}
+.pc-report-card.top {
+  width: 88%; left: 6%; top: 68px;
+  transform: rotate(0deg);
+  z-index: 3;
+}
+.pc-report-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.pc-report-dot { width: 10px; height: 10px; border-radius: 50%; }
+.pc-report-dot.green  { background: var(--success); }
+.pc-report-dot.amber  { background: var(--sun); }
+.pc-report-title { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+.pc-report-sub   { font-size: 0.72rem; color: var(--muted); }
+.pc-report-rows  { display: flex; flex-direction: column; gap: 8px; }
+.pc-report-row   { display: flex; justify-content: space-between; align-items: center; }
+.pc-report-row-label { font-size: 0.72rem; color: var(--muted); }
+.pc-report-row-val   { font-size: 0.78rem; font-weight: 700; color: var(--ink); }
+.pc-report-row-val.teal  { color: var(--teal); }
+.pc-report-row-val.amber { color: var(--sun-dark); }
+.pc-bar { height: 5px; border-radius: 3px; background: var(--border); margin-top: 4px; overflow: hidden; }
+.pc-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--teal), var(--sun)); }
+.pc-badge-sent {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0;
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.7rem; font-weight: 700; margin-top: 12px;
+}
+
+/* Developers visual — data insight cards */
+.pd-cards { display: flex; flex-direction: column; gap: 14px; }
+.pd-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: var(--r); padding: 18px 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.pd-card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.pd-card-title { font-size: 0.88rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.pd-card-desc  { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.55; }
+.pd-card-val   { font-size: 1.1rem; font-weight: 800; color: #FBBF24; margin-top: 4px; }
+
+/* Responsive partner */
+@media (max-width: 860px) {
+  .partner-split { grid-template-columns: 1fr; gap: 40px; }
+  .partner-split.reverse { direction: ltr; }
+  .partner-section { padding: 64px 0; }
+  .pc-report-stack { height: 290px; }
+}
+@media (max-width: 500px) {
+  .partner-cta-row { flex-direction: column; align-items: flex-start; }
+  .btn-partner-secondary { margin-left: 0; }
+}
+
 /* ═══════════════════════════ NAV PAY LINK ═══════════════════════════ */
 .nav-pay-link {
   background: transparent;
@@ -1361,6 +1545,234 @@ footer {
   </div>
 </div>
 
+<!-- ═══════ FOR SOLAR COMPANIES ═══════ -->
+<section class="partner-section companies-bg" id="for-companies">
+  <div class="partner-inner">
+    <div class="partner-split">
+
+      <!-- Text -->
+      <div class="partner-text">
+        <div class="partner-icon-wrap orange">🏢</div>
+        <div class="partner-label teal">For Solar Companies</div>
+        <h2 class="partner-heading dark-text">Register your clients with us — <em>we hand you the data</em> to close the deal.</h2>
+        <p class="partner-lead dark-text">Stop guessing at site conditions. When you register your clients on SolarSignupNG, we generate a full SunSim site assessment report for each property — satellite roof tracing, shading analysis, sun-position simulations — and deliver it directly to you so you can specify and quote a system your client will actually love.</p>
+
+        <ul class="partner-features light">
+          <li>
+            <div class="pf-icon">🛰️</div>
+            <div>
+              <strong>Ready-made site reports for every client you register</strong>
+              <span>Each SunSim report gives you the rooftop geometry, shading map, 12-month peak sun hours, and panel placement zones — everything your design team needs before sending a quote.</span>
+            </div>
+          </li>
+          <li>
+            <div class="pf-icon">📐</div>
+            <div>
+              <strong>Right-size every system from day one</strong>
+              <span>Know the usable roof area, the worst-case shading month, and the optimal tilt angle before you even visit the site. No more over- or under-specifying panels because of incomplete data.</span>
+            </div>
+          </li>
+          <li>
+            <div class="pf-icon">🤝</div>
+            <div>
+              <strong>Verified, qualified demand — not cold leads</strong>
+              <span>Every client in our registry has actively declared their interest in solar, provided their location, and told us their consumption profile. You're not prospecting; you're converting warm, pre-assessed opportunities.</span>
+            </div>
+          </li>
+          <li>
+            <div class="pf-icon">📊</div>
+            <div>
+              <strong>Coverage preference already captured</strong>
+              <span>Clients tell us upfront whether they want 30%, 50%, 70%, or 100% solar coverage — so you arrive at the consultation knowing exactly what system tier they're expecting and budgeting for.</span>
+            </div>
+          </li>
+          <li>
+            <div class="pf-icon">⚡</div>
+            <div>
+              <strong>Faster sales cycles, fewer site visits</strong>
+              <span>With the SunSim report already in hand, your first client meeting becomes a proposal review — not an information-gathering exercise. Cut your average sales cycle dramatically.</span>
+            </div>
+          </li>
+        </ul>
+
+        <div class="partner-cta-row">
+          <a class="btn-partner-primary teal-btn" href="mailto:mundezintegratedservices@gmail.com?subject=Solar%20Company%20Partnership%20Enquiry&body=Hello%2C%0A%0AI%20represent%20a%20solar%20installation%20company%20and%20I%20am%20interested%20in%20registering%20our%20clients%20on%20SolarSignupNG%20and%20accessing%20SunSim%20site%20assessment%20reports.%0A%0ACompany%20name%3A%20%0AContact%20name%3A%20%0APhone%3A%20%0A%0APlease%20get%20in%20touch%20to%20discuss%20how%20we%20can%20work%20together.">
+            📩 Partner With Us
+          </a>
+          <a class="btn-partner-secondary teal-outline" href="#registration">
+            Register a Client Now →
+          </a>
+        </div>
+      </div>
+
+      <!-- Visual -->
+      <div class="partner-visual">
+        <div class="pc-report-stack">
+          <!-- Back card -->
+          <div class="pc-report-card back">
+            <div class="pc-report-header">
+              <div class="pc-report-dot amber"></div>
+              <div>
+                <div class="pc-report-title">SunSim Report — Abuja Client</div>
+                <div class="pc-report-sub">Queued for delivery</div>
+              </div>
+            </div>
+          </div>
+          <!-- Middle card -->
+          <div class="pc-report-card front">
+            <div class="pc-report-header">
+              <div class="pc-report-dot green"></div>
+              <div>
+                <div class="pc-report-title">SunSim Report — Lagos Client</div>
+                <div class="pc-report-sub">Delivered 2 hrs ago</div>
+              </div>
+            </div>
+          </div>
+          <!-- Top / main card -->
+          <div class="pc-report-card top">
+            <div class="pc-report-header">
+              <div class="pc-report-dot green"></div>
+              <div>
+                <div class="pc-report-title">SunSim Site Assessment</div>
+                <div class="pc-report-sub">Port Harcourt · Residential · 100% Coverage</div>
+              </div>
+            </div>
+            <div class="pc-report-rows">
+              <div class="pc-report-row">
+                <span class="pc-report-row-label">Usable Roof Area</span>
+                <span class="pc-report-row-val teal">48 m²</span>
+              </div>
+              <div class="pc-report-row">
+                <span class="pc-report-row-label">Peak Sun Hours (avg)</span>
+                <span class="pc-report-row-val amber">5.4 hrs/day</span>
+              </div>
+              <div class="pc-report-row">
+                <span class="pc-report-row-label">Worst Shading Month</span>
+                <span class="pc-report-row-val">August (22%)</span>
+              </div>
+              <div class="pc-report-row">
+                <span class="pc-report-row-label">Recommended Panel Zone</span>
+                <span class="pc-report-row-val teal">South-facing ridge</span>
+              </div>
+              <div>
+                <div class="pc-report-row" style="margin-top:6px">
+                  <span class="pc-report-row-label">Annual solar yield</span>
+                  <span class="pc-report-row-val" style="font-size:0.7rem;color:var(--muted)">coverage →</span>
+                </div>
+                <div class="pc-bar"><div class="pc-bar-fill" style="width:82%"></div></div>
+              </div>
+            </div>
+            <div class="pc-badge-sent">✓ Report delivered to installer</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOR DEVELOPERS ═══════ -->
+<section class="partner-section developers-bg" id="for-developers">
+  <div class="partner-inner">
+    <div class="partner-split reverse">
+
+      <!-- Visual -->
+      <div class="partner-visual">
+        <div class="pd-cards">
+          <div class="pd-card">
+            <div class="pd-card-icon">📍</div>
+            <div>
+              <div class="pd-card-title">Exact Property Coordinates</div>
+              <div class="pd-card-desc">GPS-confirmed lat/lng for every registered property, pinned by the client directly on aerial satellite imagery — not inferred from a postcode.</div>
+              <div class="pd-card-val">±3 m accuracy</div>
+            </div>
+          </div>
+          <div class="pd-card">
+            <div class="pd-card-icon">🌤️</div>
+            <div>
+              <div class="pd-card-title">Solar Resource Data</div>
+              <div class="pd-card-desc">288 hourly sun-position simulations per site covering every month of the year — irradiance, peak sun hours, and seasonal shading variance all pre-computed.</div>
+              <div class="pd-card-val">12-month matrix</div>
+            </div>
+          </div>
+          <div class="pd-card">
+            <div class="pd-card-icon">🏠</div>
+            <div>
+              <div class="pd-card-title">Roof Geometry & Shading Map</div>
+              <div class="pd-card-desc">Satellite-traced roof outline, usable panel area, and a full shading model accounting for trees, walls, and neighbouring structures at your exact site.</div>
+              <div class="pd-card-val">Per-site PDF report</div>
+            </div>
+          </div>
+          <div class="pd-card">
+            <div class="pd-card-icon">⚡</div>
+            <div>
+              <div class="pd-card-title">Consumption & Load Profile</div>
+              <div class="pd-card-desc">Self-reported average monthly consumption, meter type, distribution band, and target solar coverage — the full demand picture before you design a single circuit.</div>
+              <div class="pd-card-val">kWh + coverage %</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="partner-text">
+        <div class="partner-icon-wrap dark">⚙️</div>
+        <div class="partner-label gold">For Solar Developers</div>
+        <h2 class="partner-heading light-text">Preliminary site intelligence that makes every installation <em>optimised</em> before groundwork begins.</h2>
+        <p class="partner-lead light-text">As a solar developer or systems engineer, the data you get at the start of a project determines everything that follows — panel count, inverter sizing, cable runs, battery capacity, and long-term yield projections. We give you that data before you mobilise to site.</p>
+
+        <ul class="partner-features dark">
+          <li>
+            <div class="pf-icon">🛰️</div>
+            <div>
+              <strong>Satellite-derived roof and site geometry</strong>
+              <span>Rooftop traces, usable area calculations, and obstruction mapping derived from high-resolution aerial imagery for every registered property — no manual survey required to get started.</span>
+            </div>
+          </li>
+          <li>
+            <div class="pf-icon">☀️</div>
+            <div>
+              <strong>Location-specific irradiance and shading data</strong>
+              <span>Sun-position simulations at the exact property latitude and longitude — not a regional average. Know the best panel orientation, tilt, and the months where shading will reduce yield before committing to a layout.</span>
+            </div>
+          </li>
+          <li>
+            <div class="pf-icon">📋</div>
+            <div>
+              <strong>Client demand profile already structured</strong>
+              <span>Average consumption, peak load period, meter type, and desired coverage level — all captured in a consistent format ready to feed straight into your system-sizing calculations.</span>
+            </div>
+          </li>
+          <li>
+            <div class="pf-icon">🔗</div>
+            <div>
+              <strong>Platform access &amp; data partnerships</strong>
+              <span>Interested in API access, bulk data exports, or direct client referrals for your pipeline? Get in touch and we'll discuss the right arrangement for your business.</span>
+            </div>
+          </li>
+        </ul>
+
+        <div class="partner-cta-row">
+          <a class="btn-partner-primary gold-btn"
+             href="mailto:mundezintegratedservices@gmail.com?subject=Developer%20Partnership%20Enquiry&body=Hello%2C%0A%0AI%20am%20a%20solar%20developer%2Fsystems%20engineer%20interested%20in%20partnering%20with%20SolarSignupNG.%0A%0APlease%20let%20me%20know%20about%3A%0A%0A%5B%5D%20Accessing%20a%20specific%20client%27s%20site%20data%20and%20SunSim%20report%0A%5B%5D%20Platform%20or%20API%20access%20for%20bulk%20data%0A%5B%5D%20A%20general%20developer%20partnership%20arrangement%0A%0AName%3A%20%0ACompany%2FOrganisation%3A%20%0APhone%3A%20%0A%0ALooking%20forward%20to%20hearing%20from%20you.">
+            ✉ Get In Touch
+          </a>
+          <a class="btn-partner-secondary ghost-light" href="#registration">
+            View the Platform →
+          </a>
+        </div>
+
+        <p style="font-size:0.78rem;color:rgba(255,255,255,0.3);margin-top:18px;line-height:1.6;">
+          Reach us directly at
+          <a href="mailto:mundezintegratedservices@gmail.com" style="color:rgba(251,191,36,0.7);text-decoration:underline;text-underline-offset:3px;">mundezintegratedservices@gmail.com</a>
+          — whether you want to partner, request a specific client's report, or discuss access to the platform.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ═══════ FOOTER ═══════ -->
 <footer>
   <div class="footer-inner">
@@ -1376,8 +1788,8 @@ footer {
       </div>
       <div class="footer-links">
         <h5>Contact</h5>
-        <a href="#">For Solar Companies</a>
-        <a href="#">For Developers</a>
+        <a href="#for-companies">For Solar Companies</a>
+        <a href="#for-developers">For Developers</a>
       </div>
     </div>
     <div class="footer-bottom">
