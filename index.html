@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>SolarSignupNG — Power Your Future</title>
+<title>SolarSignupNG v8 — Power Your Future</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -301,6 +301,122 @@ nav {
 .info-box p { font-size:0.85rem; color:#0C4A6E; margin:0 0 6px; line-height:1.6; }
 .info-box p:last-child { margin:0; }
 
+/* ═══════════════════════════ LOCATION METHOD SELECTOR ═══════════════════════════ */
+.loc-method-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;
+}
+.loc-method-card {
+  border:2px solid var(--border); border-radius:var(--r); padding:14px 12px;
+  cursor:pointer; transition:all 0.15s; text-align:center; background:var(--surface);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  position:relative;
+}
+.loc-method-card:hover { border-color:var(--teal); background:#F0FDFA; }
+.loc-method-card.active { border-color:var(--teal); background:var(--teal-light); }
+.loc-method-card::after {
+  content:'✓'; position:absolute; top:7px; right:9px;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--teal); color:#fff; font-size:0.7rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transform:scale(0.5); transition:all 0.15s;
+}
+.loc-method-card.active::after { opacity:1; transform:scale(1); }
+.loc-method-icon { font-size:1.5rem; line-height:1; }
+.loc-method-title { font-size:0.82rem; font-weight:700; color:var(--ink); line-height:1.2; }
+.loc-method-sub { font-size:0.72rem; color:var(--muted); line-height:1.4; }
+.loc-method-panel { display:none; }
+.loc-method-panel.active { display:block; }
+
+/* GPS panel */
+.gps-panel-inner {
+  background:linear-gradient(135deg,#F0FDF4,#ECFDF5);
+  border:1.5px solid #A7F3D0; border-radius:var(--r); padding:20px;
+  text-align:center;
+}
+.gps-panel-inner h4 { font-size:0.95rem; font-weight:700; color:#065F46; margin-bottom:6px; }
+.gps-panel-inner p { font-size:0.82rem; color:#166534; margin:0 0 16px; line-height:1.6; }
+.btn-gps-big {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:12px 24px; background:var(--teal); color:#fff;
+  border:none; border-radius:50px; font-size:0.92rem; font-weight:700;
+  cursor:pointer; transition:background 0.15s, transform 0.15s;
+}
+.btn-gps-big:hover { background:var(--teal-dark); transform:translateY(-1px); }
+.gps-status {
+  margin-top:12px; font-size:0.8rem; font-weight:600; color:var(--teal);
+  display:none; align-items:center; gap:6px; justify-content:center;
+}
+.gps-status.visible { display:flex; }
+
+/* Address+map panel — inherits existing .map-box styles */
+/* Address+Google Maps panel */
+.gmaps-manual-box {
+  background:var(--bg); border:1.5px solid var(--border); border-radius:var(--r);
+  overflow:hidden;
+}
+.gmaps-manual-fields {
+  display:grid; grid-template-columns:80px 1fr 130px; gap:8px;
+  padding:12px; background:#F8FAFC; border-bottom:1px solid var(--border);
+}
+.gmaps-manual-fields input {
+  padding:9px 12px; font-size:0.88rem;
+  border:1.5px solid var(--border); border-radius:var(--r-sm);
+  background:#fff; transition:border-color 0.15s; width:100%;
+}
+.gmaps-manual-fields input:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(13,148,136,0.1); }
+.gmaps-open-row {
+  padding:14px; display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:10px;
+}
+.btn-open-gmaps {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:10px 18px; background:#1a73e8; color:#fff;
+  border:none; border-radius:8px; font-size:0.88rem; font-weight:700;
+  cursor:pointer; transition:background 0.15s; text-decoration:none;
+}
+.btn-open-gmaps:hover { background:#1557b0; }
+.gmaps-open-hint { font-size:0.76rem; color:var(--muted); line-height:1.5; max-width:260px; }
+.gmaps-paste-row {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  padding:10px 14px; border-top:1px solid var(--border); background:var(--surface);
+}
+.gmaps-paste-row label { font-size:0.75rem; font-weight:700; color:var(--slate); display:block; margin-bottom:4px; }
+.gmaps-paste-row input {
+  width:100%; padding:7px 10px; font-size:0.82rem;
+  background:#fff; color:var(--ink); border:1.5px solid var(--border);
+  border-radius:var(--r-sm); font-family:monospace;
+  transition:border-color 0.15s, box-shadow 0.15s;
+}
+.gmaps-paste-row input:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(13,148,136,0.12); }
+.gmaps-paste-confirm {
+  padding:10px 14px; border-top:1px solid var(--border); background:var(--bg);
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+
+/* Meter CSS */
+.vmeter-card {
+  display:flex; align-items:center; gap:14px;
+  background:linear-gradient(135deg,#F0FDF4,#ECFDF5);
+  border:1px solid #A7F3D0; border-radius:var(--r); padding:14px 16px;
+  margin-top:8px;
+}
+.vmeter-icon {
+  width:40px; height:40px; border-radius:10px;
+  background:var(--teal); color:#fff; font-size:1.2rem;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.vmeter-text { flex:1; min-width:0; }
+.vmeter-text strong { font-size:0.85rem; font-weight:700; color:#065F46; display:block; margin-bottom:2px; }
+.vmeter-text span { font-size:0.76rem; color:#166534; line-height:1.4; }
+.vmeter-link {
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  padding:7px 14px; background:var(--teal); color:#fff;
+  border-radius:20px; font-size:0.78rem; font-weight:700;
+  text-decoration:none; transition:background 0.15s; flex-shrink:0;
+}
+.vmeter-link:hover { background:var(--teal-dark); }
+@media (max-width:560px) { .vmeter-card { flex-wrap:wrap; } .vmeter-link { width:100%; justify-content:center; } }
+
 /* MAP FEATURE */
 .map-box {
   border:1.5px solid var(--border); border-radius:var(--r);
@@ -355,8 +471,29 @@ nav {
 .latlong-row label { font-size:0.75rem; font-weight:700; color:var(--slate); display:block; margin-bottom:4px; }
 .latlong-row input {
   width:100%; padding:7px 10px; font-size:0.82rem;
-  background:#E2E8F0; color:var(--slate); border:1px solid var(--border);
-  border-radius:var(--r-sm); font-family:monospace; cursor:default;
+  background:#fff; color:var(--ink); border:1.5px solid var(--border);
+  border-radius:var(--r-sm); font-family:monospace; cursor:text;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.latlong-row input:focus {
+  outline:none; border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(13,148,136,0.12);
+}
+.latlong-row input::placeholder { color:var(--muted); font-size:0.75rem; }
+.gmaps-link-row {
+  padding:8px 12px; border-top:1px solid var(--border); background:#F0FDF4;
+  display:none; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.gmaps-link-row.visible { display:flex; }
+.gmaps-link-row a {
+  font-size:0.8rem; font-weight:700; color:#16A34A;
+  text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+  padding:5px 12px; border-radius:20px; background:#DCFCE7;
+  border:1px solid #BBF7D0; transition:background 0.15s;
+}
+.gmaps-link-row a:hover { background:#BBF7D0; }
+.gmaps-link-row span {
+  font-size:0.76rem; color:var(--slate); line-height:1.4;
 }
 .map-actions {
   display:flex; gap:8px; padding:10px 12px;
@@ -633,6 +770,9 @@ footer {
   .btn-hero-primary, .btn-hero-secondary { width:100%; justify-content:center; }
   .hero-actions { flex-direction:column; }
   .map-search-row input { min-width:80px; }
+  .loc-method-grid { grid-template-columns:1fr; }
+  .gmaps-manual-fields { grid-template-columns:1fr 1fr; }
+  .gmaps-paste-row { grid-template-columns:1fr; }
   .form-steps { gap:2px; }
   .form-step-tab { font-size:0.7rem; padding:7px 10px; }
   #property-map { height:250px; }
@@ -653,6 +793,41 @@ footer {
 }
 
 /* ═══════════════════════════ PARTNER SECTIONS ═══════════════════════════ */
+
+/* Partner/installer checkbox reveal */
+.partner-toggle-row {
+  display:flex; align-items:flex-start; gap:12px;
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:var(--r); padding:14px 16px; margin-bottom:16px;
+  cursor:pointer; transition:border-color 0.15s, background 0.15s;
+}
+.partner-toggle-row:hover { border-color:var(--teal); background:var(--teal-light); }
+.partner-toggle-row input[type=checkbox] {
+  width:18px; height:18px; flex-shrink:0; margin-top:2px; cursor:pointer;
+  accent-color:var(--teal);
+}
+.partner-toggle-label { font-size:0.9rem; font-weight:600; color:var(--ink); line-height:1.4; }
+.partner-toggle-label span { display:block; font-size:0.78rem; font-weight:400; color:var(--muted); margin-top:2px; }
+.partner-company-field {
+  display:none; margin-bottom:20px;
+  background:#F0FDF4; border:1.5px solid #A7F3D0;
+  border-radius:var(--r); padding:16px;
+}
+.partner-company-field.visible { display:block; }
+.partner-company-field label {
+  display:block; font-size:0.82rem; font-weight:700;
+  color:#065F46; margin-bottom:6px;
+}
+.partner-company-field input {
+  width:100%; padding:11px 14px;
+  border:1.5px solid #6EE7B7; border-radius:var(--r-sm);
+  font-size:0.95rem; color:var(--ink); background:#fff;
+  transition:border-color 0.15s, box-shadow 0.15s;
+}
+.partner-company-field input:focus {
+  outline:none; border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(13,148,136,0.12);
+}
 
 /* Shared two-column partner layout */
 .partner-section { padding: 90px 0; }
@@ -1255,101 +1430,152 @@ footer {
 
           <input type="hidden" id="address" name="address">
 
-          <!-- ── STEP 1 of 2: Aerial Pin ── -->
+          <!-- ── LOCATION METHOD SELECTOR ── -->
           <div class="field">
-            <label>📍 Pin Your Property on the Aerial Map *</label>
-            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:10px">Enter your address, click <strong>Find</strong>, then click your building rooftop to drop a pin. Nigerian addresses can be tricky — just zoom in manually if needed.</p>
-            <div class="map-box">
-              <div class="map-search-row">
-                <input type="text" id="map-house" placeholder="No." style="max-width:70px">
-                <input type="text" id="map-street" placeholder="Street name">
-                <input type="text" id="map-city" placeholder="City" style="max-width:130px">
-                <button type="button" class="btn-search" onclick="searchAddress()">🔍 Find</button>
-                <button type="button" class="btn-gps" onclick="useMyGPS()">📍 GPS</button>
+            <label>📍 Pin Your Property Location *</label>
+            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;">Choose the method that works best for you — accurate coordinates give a better solar assessment.</p>
+
+            <!-- 3-option cards -->
+            <div class="loc-method-grid">
+              <div class="loc-method-card" id="lmc-gps" onclick="selectLocMethod('gps')">
+                <div class="loc-method-icon">📡</div>
+                <div class="loc-method-title">Use GPS</div>
+                <div class="loc-method-sub">You're at the property right now</div>
               </div>
-              <div id="property-map" style="position:relative;">
-                <div class="map-zoom-notice" id="map-zoom-notice"></div>
+              <div class="loc-method-card" id="lmc-map" onclick="selectLocMethod('map')">
+                <div class="loc-method-icon">🗺️</div>
+                <div class="loc-method-title">Search &amp; Pin Map</div>
+                <div class="loc-method-sub">Type address, click rooftop on aerial map</div>
               </div>
-              <div class="map-status-bar idle" id="map-hint">
-                <span class="status-pulse"></span>
-                <span id="map-hint-text">Enter your address and click Find, or tap GPS. Then click your building to drop a pin.</span>
-              </div>
-              <div class="latlong-row">
-                <div>
-                  <label for="latitude">Latitude</label>
-                  <input type="text" id="latitude" name="latitude" readonly placeholder="Pin the map first">
-                </div>
-                <div>
-                  <label for="longitude">Longitude</label>
-                  <input type="text" id="longitude" name="longitude" readonly placeholder="Pin the map first">
-                </div>
-              </div>
-              <div class="map-actions">
-                <button type="button" class="btn-confirm" id="btn-confirm-pin" onclick="confirmPin()" disabled>✓ Confirm Aerial Pin</button>
-                <button type="button" class="btn-clear-pin" onclick="clearPin()">✕ Clear</button>
-                <span class="confirmed-badge" id="confirm-badge">✓ Aerial pin saved</span>
+              <div class="loc-method-card" id="lmc-gmaps" onclick="selectLocMethod('gmaps')">
+                <div class="loc-method-icon">📌</div>
+                <div class="loc-method-title">Use Google Maps</div>
+                <div class="loc-method-sub">Better resolution — pin &amp; paste coordinates</div>
               </div>
             </div>
-            <p class="map-tip">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              If your street doesn't resolve, zoom in on satellite view and click your rooftop manually. At very close zoom the satellite image may look blurry — that's normal upscaling, not a broken map. Drop the pin anyway.
-            </p>
-          </div>
 
-          <!--
-            ══════════════════════════════════════════════════════════════════════
-            STREET VIEW CONFIRMATION — NULLED OUT (No Google Maps API key yet)
-            ══════════════════════════════════════════════════════════════════════
-            This entire block is commented out until a Google Maps API key is available.
-            To re-enable:
-              1. Obtain & enable a Google Maps Embed API key in Google Cloud Console.
-              2. Set GOOGLE_MAPS_KEY variable in the <script> section below.
-              3. Un-comment this entire HTML block.
-              4. Un-comment the Street View JS functions in the <script> section.
-
-          <div class="field">
-            <label>🏠 Step 2 of 2 — Confirm Your House in Street View</label>
-            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:8px">
-              After pinning your property above, use the Street View below to confirm the building.
-            </p>
-            <div class="sv-section">
-              <div class="sv-header">
-                <div class="sv-header-left">
-                  <span class="sv-tag">🌐 Street View</span>
-                  <div>
-                    <div class="sv-title">Walk your street to confirm</div>
-                    <div class="sv-sub">Once your aerial pin is confirmed, load Street View to verify</div>
+            <!-- PANEL A: GPS -->
+            <div class="loc-method-panel" id="lmp-gps">
+              <div class="gps-panel-inner">
+                <h4>📡 Detect My Location with GPS</h4>
+                <p>Only use this option if you are <strong>physically at the property</strong> right now. Your device GPS will pinpoint the building and drop a pin automatically.</p>
+                <button type="button" class="btn-gps-big" onclick="useMyGPS()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/></svg>
+                  Detect My Location
+                </button>
+                <div class="gps-status" id="gps-status">
+                  <span class="status-pulse" style="background:var(--teal);animation:blink 1s infinite;"></span>
+                  <span id="gps-status-text">Detecting…</span>
+                </div>
+              </div>
+              <!-- shared confirm bar -->
+              <div id="gps-map-wrap" style="display:none;margin-top:12px;">
+                <div class="map-box">
+                  <div id="property-map-gps" style="width:100%;height:260px;cursor:crosshair;position:relative;">
+                    <div class="map-zoom-notice" id="map-zoom-notice-gps"></div>
+                  </div>
+                  <div class="map-status-bar idle" id="map-hint-gps">
+                    <span class="status-pulse"></span>
+                    <span id="map-hint-text-gps">GPS located you — drag the pin to your exact rooftop, then confirm.</span>
+                  </div>
+                  <div class="latlong-row">
+                    <div><label>Latitude</label><input type="text" id="lat-gps" placeholder="—" oninput="syncLatLng('gps')" style="font-family:monospace;"></div>
+                    <div><label>Longitude</label><input type="text" id="lng-gps" placeholder="—" oninput="syncLatLng('gps')" style="font-family:monospace;"></div>
+                  </div>
+                  <div class="map-actions">
+                    <button type="button" class="btn-confirm" id="btn-confirm-gps" onclick="confirmLocation('gps')" disabled>✓ Confirm This Location</button>
+                    <button type="button" class="btn-clear-pin" onclick="clearLocation('gps')">✕ Clear</button>
+                    <span class="confirmed-badge" id="badge-gps">✓ Location confirmed</span>
                   </div>
                 </div>
-                <button type="button" class="btn-load-sv" id="btn-load-sv" onclick="loadStreetView()" disabled>
-                  Load Street View
-                </button>
-              </div>
-              <div id="sv-map-container">
-                <iframe id="sv-iframe" src="" allowfullscreen></iframe>
-              </div>
-              <div id="sv-placeholder" class="sv-placeholder">
-                <div class="sv-placeholder-icon">🏘️</div>
-                <div>Pin and confirm your aerial location first, then load Street View here.</div>
-              </div>
-              <div class="sv-confirm-bar" id="sv-confirm-bar">
-                <div class="sv-confirm-note">
-                  Can you see your house? Click <strong>Confirm</strong> to save, or <strong>Skip</strong> to proceed.
-                </div>
-                <div style="display:flex;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn-sv-confirm" onclick="confirmStreetView()">✓ Confirmed</button>
-                  <button type="button" class="btn-sv-skip" onclick="skipStreetView()">Skip</button>
-                </div>
-              </div>
-              <div style="padding:8px 14px;background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                <span class="sv-confirmed-badge" id="sv-confirmed-badge">✓ Street view confirmed</span>
-                <span id="sv-skip-note" style="font-size:0.75rem;color:var(--muted);display:none;">Street view skipped — aerial pin only.</span>
               </div>
             </div>
+
+            <!-- PANEL B: Search + embedded map -->
+            <div class="loc-method-panel" id="lmp-map">
+              <div class="map-box">
+                <div class="map-search-row">
+                  <input type="text" id="map-house" placeholder="No." style="max-width:70px">
+                  <input type="text" id="map-street" placeholder="Street name">
+                  <input type="text" id="map-city" placeholder="City" style="max-width:130px">
+                  <button type="button" class="btn-search" onclick="searchAddress()">🔍 Find</button>
+                </div>
+                <div id="property-map" style="width:100%;height:320px;cursor:crosshair;position:relative;">
+                  <div class="map-zoom-notice" id="map-zoom-notice"></div>
+                </div>
+                <div class="map-status-bar idle" id="map-hint">
+                  <span class="status-pulse"></span>
+                  <span id="map-hint-text">Enter address and click Find, then click your building rooftop to drop a pin.</span>
+                </div>
+                <div class="latlong-row">
+                  <div><label>Latitude</label><input type="text" id="lat-map" placeholder="e.g. 6.524379" oninput="syncLatLng('map')" style="font-family:monospace;"></div>
+                  <div><label>Longitude</label><input type="text" id="lng-map" placeholder="e.g. 3.379206" oninput="syncLatLng('map')" style="font-family:monospace;"></div>
+                </div>
+                <div class="map-actions">
+                  <button type="button" class="btn-confirm" id="btn-confirm-map" onclick="confirmLocation('map')" disabled>✓ Confirm This Pin</button>
+                  <button type="button" class="btn-clear-pin" onclick="clearLocation('map')">✕ Clear</button>
+                  <span class="confirmed-badge" id="badge-map">✓ Location confirmed</span>
+                </div>
+              </div>
+              <p class="map-tip" style="margin-top:8px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                If your street isn't found, zoom in manually on satellite view and click the rooftop. If tiles are slow to load, try Option 3 (Google Maps) instead.
+              </p>
+            </div>
+
+            <!-- PANEL C: Google Maps manual paste -->
+            <div class="loc-method-panel" id="lmp-gmaps">
+              <div class="gmaps-manual-box">
+                <!-- Address fields to build the Google Maps search link -->
+                <div class="gmaps-manual-fields">
+                  <input type="text" id="gm-house" placeholder="No.">
+                  <input type="text" id="gm-street" placeholder="Street name">
+                  <input type="text" id="gm-city" placeholder="City / Area">
+                </div>
+                <div class="gmaps-open-row">
+                  <div>
+                    <a id="btn-open-gmaps" href="#" target="_blank" rel="noopener" class="btn-open-gmaps" onclick="buildGMapsLink(event)">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      Open in Google Maps ↗
+                    </a>
+                    <p style="font-size:0.72rem;color:var(--muted);margin:6px 0 0;line-height:1.4;">Fills in your address — or opens blank for you to search manually.</p>
+                  </div>
+                  <div class="gmaps-open-hint">
+                    <strong style="display:block;font-size:0.78rem;color:var(--ink);margin-bottom:3px;">How to get coordinates:</strong>
+                    1. Find your property in Google Maps<br>
+                    2. Long-press (mobile) or right-click (desktop) on the rooftop<br>
+                    3. Tap the coordinates shown — they copy to clipboard<br>
+                    4. Paste into the fields below
+                  </div>
+                </div>
+                <div class="gmaps-paste-row">
+                  <div>
+                    <label>Latitude (paste here)</label>
+                    <input type="text" id="lat-gmaps" placeholder="e.g. 6.524379" oninput="syncLatLng('gmaps')">
+                  </div>
+                  <div>
+                    <label>Longitude (paste here)</label>
+                    <input type="text" id="lng-gmaps" placeholder="e.g. 3.379206" oninput="syncLatLng('gmaps')">
+                  </div>
+                </div>
+                <div class="gmaps-paste-confirm">
+                  <button type="button" class="btn-confirm" id="btn-confirm-gmaps" onclick="confirmLocation('gmaps')" disabled>✓ Confirm These Coordinates</button>
+                  <button type="button" class="btn-clear-pin" onclick="clearLocation('gmaps')">✕ Clear</button>
+                  <span class="confirmed-badge" id="badge-gmaps">✓ Location confirmed</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shared hidden fields used by all methods -->
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+
+            <!-- Master confirmed banner (shows regardless of method used) -->
+            <div id="loc-confirmed-banner" style="display:none;margin-top:10px;padding:10px 14px;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:var(--r);font-size:0.82rem;font-weight:600;color:#065F46;display:none;align-items:center;gap:8px;">
+              ✓ <span id="loc-confirmed-text">Location confirmed</span>
+            </div>
           </div>
-          END STREET VIEW BLOCK
-          ══════════════════════════════════════════════════════════════════════
-          -->
+
 
           <div class="step-nav">
             <button type="button" class="btn-prev" onclick="goStep(1)">← Back</button>
@@ -1417,21 +1643,16 @@ footer {
                 <option value="kwh">kWh</option>
               </select>
             </div>
-            <!-- Virtual Meter Link -->
-            <div class="meter-link-box">
-              <div class="meter-link-icon">🔌</div>
-              <div class="meter-link-content">
-                <h4>Not sure of your monthly usage? Try the Virtual Power Meter</h4>
-                <p>
-                  The <strong>VirtualPowerMeterNG</strong> simulates an electricity meter so you can get familiar with how your physical prepaid meter works — helping you understand units, tariff rates, and how to read your DISCO meter at home. It won't give your exact monthly kWh directly, but it's a great tool to help you understand your meter and estimate consumption from your usage habits.
-                  <br><br>
-                  <em>Tip: Check your prepaid meter's token receipts or contact your DISCO for monthly usage history.</em>
-                </p>
-                <a href="https://cryptonian0xx.github.io/VirtualPowerMeterNG/" target="_blank" rel="noopener">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  Open VirtualPowerMeterNG ↗
-                </a>
+            <!-- Virtual Meter compact card -->
+            <div class="vmeter-card">
+              <div class="vmeter-icon">🔌</div>
+              <div class="vmeter-text">
+                <strong>Not sure of your monthly usage?</strong>
+                <span>Use the VirtualPowerMeterNG to simulate your prepaid meter and estimate monthly kWh.</span>
               </div>
+              <a href="https://cryptonian0xx.github.io/VirtualPowerMeterNG/" target="_blank" rel="noopener" class="vmeter-link">
+                Try it ↗
+              </a>
             </div>
           </div>
 
@@ -1516,6 +1737,19 @@ footer {
             <input type="tel" id="referral-phone" name="referral-phone" placeholder="e.g. 08098765432">
           </div>
 
+          <!-- Partner / Installer toggle -->
+          <label class="partner-toggle-row" for="is-partner-toggle">
+            <input type="checkbox" id="is-partner-toggle" onchange="togglePartnerField(this)">
+            <div class="partner-toggle-label">
+              🏢 I'm registering this client on behalf of a solar company or installer
+              <span>Check this if you're a partner company or independent installer submitting on behalf of a client.</span>
+            </div>
+          </label>
+          <div class="partner-company-field" id="partner-company-field">
+            <label for="partner-company">Your Company / Installer Name *</label>
+            <input type="text" id="partner-company" name="partner-company" placeholder="e.g. Greenlight Solar Ltd">
+          </div>
+
           <div class="privacy-box">
             <h4>🔒 Data Privacy Notice</h4>
             <p>Your information is collected solely for solar demand aggregation and feasibility assessment. Data may be shared in aggregated, anonymised form with solar companies, financiers, and planning agencies. No personal data is sold to third parties. By submitting, you consent to being contacted by solar service providers.</p>
@@ -1596,7 +1830,7 @@ footer {
         </ul>
 
         <div class="partner-cta-row">
-          <a class="btn-partner-primary teal-btn" href="mailto:mundezintegratedservices@gmail.com?subject=Solar%20Company%20Partnership%20Enquiry&body=Hello%2C%0A%0AI%20represent%20a%20solar%20installation%20company%20and%20I%20am%20interested%20in%20registering%20our%20clients%20on%20SolarSignupNG%20and%20accessing%20SunSim%20site%20assessment%20reports.%0A%0ACompany%20name%3A%20%0AContact%20name%3A%20%0APhone%3A%20%0A%0APlease%20get%20in%20touch%20to%20discuss%20how%20we%20can%20work%20together.">
+          <a class="btn-partner-primary teal-btn" href="/cdn-cgi/l/email-protection#5538203b31302f3c3b2130322734213031263027233c363026153238343c397b363a386a2620373f30362168063a393427706765163a3825343b2c706765053427213b3027263d3c25706765103b24203c272c73373a312c681d3039393a7067167065147065141c706765273025273026303b2170676534706765263a3934277067653c3b262134393934213c3a3b706765363a3825343b2c706765343b317067651c70676534387067653c3b21302730262130317067653c3b7067652730323c262130273c3b327067653a202770676536393c303b21267067653a3b706765063a393427063c323b20251b12706765343b317067653436363026263c3b3270676506203b063c38706765263c213070676534262630262638303b217067652730253a2721267b706514706514163a3825343b2c7067653b343830706614706765706514163a3b213436217067653b343830706614706765706514053d3a3b307066147067657065147065140539303426307067653230217067653c3b706765213a20363d706765213a706765313c26362026267067653d3a22706765223070676536343b706765223a273e706765213a3230213d30277b">
             📩 Partner With Us
           </a>
           <a class="btn-partner-secondary teal-outline" href="#registration">
@@ -1753,8 +1987,7 @@ footer {
         </ul>
 
         <div class="partner-cta-row">
-          <a class="btn-partner-primary gold-btn"
-             href="mailto:mundezintegratedservices@gmail.com?subject=Developer%20Partnership%20Enquiry&body=Hello%2C%0A%0AI%20am%20a%20solar%20developer%2Fsystems%20engineer%20interested%20in%20partnering%20with%20SolarSignupNG.%0A%0APlease%20let%20me%20know%20about%3A%0A%0A%5B%5D%20Accessing%20a%20specific%20client%27s%20site%20data%20and%20SunSim%20report%0A%5B%5D%20Platform%20or%20API%20access%20for%20bulk%20data%0A%5B%5D%20A%20general%20developer%20partnership%20arrangement%0A%0AName%3A%20%0ACompany%2FOrganisation%3A%20%0APhone%3A%20%0A%0ALooking%20forward%20to%20hearing%20from%20you.">
+          <a class="btn-partner-primary gold-btn" href="/cdn-cgi/l/email-protection#95f8e0fbf1f0effcfbe1f0f2e7f4e1f0f1e6f0e7e3fcf6f0e6d5f2f8f4fcf9bbf6faf8aae6e0f7fff0f6e1a8d1f0e3f0f9fae5f0e7b0a7a5c5f4e7e1fbf0e7e6fdfce5b0a7a5d0fbe4e0fce7ecb3f7faf1eca8ddf0f9f9fab0a7d6b0a5d4b0a5d4dcb0a7a5f4f8b0a7a5f4b0a7a5e6faf9f4e7b0a7a5f1f0e3f0f9fae5f0e7b0a7d3e6ece6e1f0f8e6b0a7a5f0fbf2fcfbf0f0e7b0a7a5fcfbe1f0e7f0e6e1f0f1b0a7a5fcfbb0a7a5e5f4e7e1fbf0e7fcfbf2b0a7a5e2fce1fdb0a7a5c6faf9f4e7c6fcf2fbe0e5dbd2bbb0a5d4b0a5d4c5f9f0f4e6f0b0a7a5f9f0e1b0a7a5f8f0b0a7a5fefbfae2b0a7a5f4f7fae0e1b0a6d4b0a5d4b0a5d4b0a0d7b0a0d1b0a7a5d4f6f6f0e6e6fcfbf2b0a7a5f4b0a7a5e6e5f0f6fcf3fcf6b0a7a5f6f9fcf0fbe1b0a7a2e6b0a7a5e6fce1f0b0a7a5f1f4e1f4b0a7a5f4fbf1b0a7a5c6e0fbc6fcf8b0a7a5e7f0e5fae7e1b0a5d4b0a0d7b0a0d1b0a7a5c5f9f4e1f3fae7f8b0a7a5fae7b0a7a5d4c5dcb0a7a5f4f6f6f0e6e6b0a7a5f3fae7b0a7a5f7e0f9feb0a7a5f1f4e1f4b0a5d4b0a0d7b0a0d1b0a7a5d4b0a7a5f2f0fbf0e7f4f9b0a7a5f1f0e3f0f9fae5f0e7b0a7a5e5f4e7e1fbf0e7e6fdfce5b0a7a5f4e7e7f4fbf2f0f8f0fbe1b0a5d4b0a5d4dbf4f8f0b0a6d4b0a7a5b0a5d4d6faf8e5f4fbecb0a7d3dae7f2f4fbfce6f4e1fcfafbb0a6d4b0a7a5b0a5d4c5fdfafbf0b0a6d4b0a7a5b0a5d4b0a5d4d9fafafefcfbf2b0a7a5f3fae7e2f4e7f1b0a7a5e1fab0a7a5fdf0f4e7fcfbf2b0a7a5f3e7faf8b0a7a5ecfae0bb">
             ✉ Get In Touch
           </a>
           <a class="btn-partner-secondary ghost-light" href="#registration">
@@ -1764,7 +1997,7 @@ footer {
 
         <p style="font-size:0.78rem;color:rgba(255,255,255,0.3);margin-top:18px;line-height:1.6;">
           Reach us directly at
-          <a href="mailto:mundezintegratedservices@gmail.com" style="color:rgba(251,191,36,0.7);text-decoration:underline;text-underline-offset:3px;">mundezintegratedservices@gmail.com</a>
+          <a href="/cdn-cgi/l/email-protection#6f021a010b0a1506011b0a081d0e1b0a0b1c0a1d19060c0a1c2f08020e0603410c0002" style="color:rgba(251,191,36,0.7);text-decoration:underline;text-underline-offset:3px;"><span class="__cf_email__" data-cfemail="abc6dec5cfced1c2c5dfceccd9cadfcecfd8ced9ddc2c8ced8ebccc6cac2c785c8c4c6">[email&#160;protected]</span></a>
           — whether you want to partner, request a specific client's report, or discuss access to the platform.
         </p>
       </div>
@@ -1992,7 +2225,7 @@ footer {
 
 
 <!-- ═══════ SCRIPTS ═══════ -->
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ══════════════════════════════════════════
 // CONFIG — update these
 // ══════════════════════════════════════════
@@ -2051,6 +2284,13 @@ function validateStep(n) {
   if (n === 4) {
     if (!document.getElementById('coverage-level').value) { msg = 'Please select a solar coverage level.'; ok = false; }
   }
+  if (n === 5) {
+    var isPartner = document.getElementById('is-partner-toggle').checked;
+    if (isPartner && !document.getElementById('partner-company').value.trim()) {
+      showFieldError('partner-company', 'Please enter your company or installer name.');
+      ok = false;
+    }
+  }
   if (!ok && msg) showFormError(msg);
   return ok;
 }
@@ -2075,6 +2315,20 @@ document.querySelectorAll('.field input, .field select').forEach(function(el){
 });
 
 // ══════════════════════════════════════════
+// PARTNER / INSTALLER TOGGLE
+// ══════════════════════════════════════════
+function togglePartnerField(checkbox) {
+  var field = document.getElementById('partner-company-field');
+  if (checkbox.checked) {
+    field.classList.add('visible');
+    document.getElementById('partner-company').focus();
+  } else {
+    field.classList.remove('visible');
+    document.getElementById('partner-company').value = '';
+  }
+}
+
+// ══════════════════════════════════════════
 // METER TYPE
 // ══════════════════════════════════════════
 function selectMeter(val, card) {
@@ -2093,348 +2347,294 @@ function selectCoverage(card) {
 }
 
 // ══════════════════════════════════════════
-// MAP PIN (AERIAL)
+// LOCATION METHOD SELECTOR
 // ══════════════════════════════════════════
-var propMap, pinMarker;
+var _activeMethod = null; // 'gps' | 'map' | 'gmaps'
+var propMap = null, propMapGps = null;
+var pinMarker = null, pinMarkerGps = null;
 
 var pinIcon = L.divIcon({
   html: '<div style="width:28px;height:38px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))">' +
         '<svg viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">' +
         '<path d="M14 0C6.27 0 0 6.27 0 14c0 9.625 14 24 14 24S28 23.625 28 14C28 6.27 21.73 0 14 0z" fill="#0D9488"/>' +
         '<circle cx="14" cy="14" r="6" fill="white"/></svg></div>',
-  className: '', iconSize:[28,38], iconAnchor:[14,38], popupAnchor:[0,-40]
+  className:'', iconSize:[28,38], iconAnchor:[14,38], popupAnchor:[0,-40]
 });
 
-window.addEventListener('load', function() {
-  propMap = L.map('property-map', { zoomControl:true, preferCanvas:true }).setView([9.082, 8.6753], 6);
+var _tileOpts = {
+  maxZoom:21, maxNativeZoom:19, tileSize:256, crossOrigin:true,
+  keepBuffer:4, updateWhenIdle:false, updateWhenZooming:false
+};
 
-  // Satellite: Esri World Imagery with maxNativeZoom=19 to prevent blank tiles at high zoom
-  // At zoom 20+, Leaflet will upscale z=19 tiles rather than requesting missing z=20/21 tiles
-  var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-      maxZoom: 21,
-      maxNativeZoom: 19,   // tiles only exist up to z=19; Leaflet upscales beyond that
-      tileSize: 256,
-      crossOrigin: true
-    }
-  );
-
-  // Fallback satellite: Google-compatible via Esri World Imagery Labels overlay
-  var satLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-    {
-      attribution: '',
-      maxZoom: 21,
-      maxNativeZoom: 19,
-      tileSize: 256,
-      crossOrigin: true,
-      opacity: 0.7
-    }
-  );
-
-  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-      maxNativeZoom: 19,
-      crossOrigin: true
-    }
-  );
-
-  // Handle tile errors gracefully — show hint instead of broken tile icons
-  sat.on('tileerror', function(e) {
-    // silently suppress — maxNativeZoom handles most cases, this is a safety net
+function selectLocMethod(method) {
+  _activeMethod = method;
+  ['gps','map','gmaps'].forEach(function(m) {
+    document.getElementById('lmc-' + m).classList.toggle('active', m === method);
+    document.getElementById('lmp-' + m).classList.toggle('active', m === method);
   });
+  document.getElementById('latitude').value  = '';
+  document.getElementById('longitude').value = '';
+  document.getElementById('address').value   = '';
+  hideBanner();
+  if (method === 'map' && !propMap) initEmbeddedMap();
+}
 
+function initEmbeddedMap() {
+  propMap = L.map('property-map', { zoomControl:true, preferCanvas:true }).setView([9.082,8.6753],6);
+  var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    Object.assign({ attribution:'Tiles &copy; Esri' }, _tileOpts));
+  var satLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    Object.assign({ attribution:'', opacity:0.7 }, _tileOpts));
+  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    Object.assign({ attribution:'&copy; OpenStreetMap contributors' }, _tileOpts));
   sat.addTo(propMap);
-
-  // Layer control: satellite with optional label overlay, plus street map
-  var baseLayers  = { 'Satellite': sat, 'Street map': osm };
-  var overlays    = { 'Place labels': satLabels };
-  L.control.layers(baseLayers, overlays, { position:'topright' }).addTo(propMap);
-
-  propMap.on('click', function(e){ dropPin(e.latlng.lat, e.latlng.lng); });
-
-  // Let users know when they're at max native zoom (tiles upscale, not "unavailable")
+  L.control.layers({'Satellite':sat,'Street map':osm},{'Place labels':satLabels},{position:'topright'}).addTo(propMap);
+  propMap.on('click', function(e){ dropPin('map', e.latlng.lat, e.latlng.lng); });
   propMap.on('zoomend', function() {
     var z = propMap.getZoom();
-    var notice = document.getElementById('map-zoom-notice');
-    if (notice) {
-      if (z >= 19) {
-        notice.textContent = z >= 20 ? '🔍 Max zoom — image is being upscaled' : '🔍 Near max zoom — click to drop a pin';
-        notice.classList.add('visible');
-      } else {
-        notice.classList.remove('visible');
-      }
+    var n = document.getElementById('map-zoom-notice');
+    if (n) {
+      if (z >= 19) { n.textContent = z>=20?'\uD83D\uDD0D Max zoom — image upscaling':'\uD83D\uDD0D Near max zoom — click to drop a pin'; n.classList.add('visible'); }
+      else { n.classList.remove('visible'); }
     }
   });
   ['map-house','map-street','map-city'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.addEventListener('keydown', function(e){ if(e.key==='Enter'){e.preventDefault();searchAddress();} });
   });
-});
+}
 
-function dropPin(lat, lng) {
-  document.getElementById('confirm-badge').style.display = 'none';
-  document.getElementById('latitude').value  = lat.toFixed(6);
-  document.getElementById('longitude').value = lng.toFixed(6);
-  document.getElementById('btn-confirm-pin').disabled = false;
-  // Reset street view state when pin moves
-  resetStreetViewState();
-  if (pinMarker) { pinMarker.setLatLng([lat, lng]); }
-  else {
-    pinMarker = L.marker([lat, lng], { icon:pinIcon, draggable:true }).addTo(propMap);
-    pinMarker.on('dragend', function(e){ var p=e.target.getLatLng(); dropPin(p.lat,p.lng); });
+function initGpsMap(lat, lng) {
+  if (propMapGps) { propMapGps.setView([lat,lng],19); dropPin('gps',lat,lng); return; }
+  document.getElementById('gps-map-wrap').style.display = 'block';
+  propMapGps = L.map('property-map-gps', { zoomControl:true, preferCanvas:true }).setView([lat,lng],19);
+  var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    Object.assign({ attribution:'Tiles &copy; Esri' }, _tileOpts));
+  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    Object.assign({ attribution:'&copy; OpenStreetMap contributors' }, _tileOpts));
+  sat.addTo(propMapGps);
+  L.control.layers({'Satellite':sat,'Street map':osm},{},{position:'topright'}).addTo(propMapGps);
+  propMapGps.on('click', function(e){ dropPin('gps',e.latlng.lat,e.latlng.lng); });
+  dropPin('gps',lat,lng);
+}
+
+function dropPin(panel, lat, lng) {
+  var latId = panel==='gps'?'lat-gps':(panel==='map'?'lat-map':'lat-gmaps');
+  var lngId = panel==='gps'?'lng-gps':(panel==='map'?'lng-map':'lng-gmaps');
+  document.getElementById(latId).value = lat.toFixed(6);
+  document.getElementById(lngId).value = lng.toFixed(6);
+  var btn = document.getElementById('btn-confirm-'+panel);
+  if (btn) btn.disabled = false;
+  var badge = document.getElementById('badge-'+panel);
+  if (badge) badge.style.display = 'none';
+  if (panel === 'map') {
+    if (pinMarker) { pinMarker.setLatLng([lat,lng]); }
+    else {
+      pinMarker = L.marker([lat,lng],{icon:pinIcon,draggable:true}).addTo(propMap);
+      pinMarker.on('dragend', function(e){ var p=e.target.getLatLng(); dropPin('map',p.lat,p.lng); });
+    }
+    setHint('map','pinned','Pin at '+lat.toFixed(5)+', '+lng.toFixed(5)+' — drag to adjust, then confirm.');
   }
-  setHint('pinned', 'Pin placed at ' + lat.toFixed(5) + ', ' + lng.toFixed(5) + '. Drag to adjust, then confirm.');
+  if (panel === 'gps') {
+    if (pinMarkerGps) { pinMarkerGps.setLatLng([lat,lng]); }
+    else {
+      pinMarkerGps = L.marker([lat,lng],{icon:pinIcon,draggable:true}).addTo(propMapGps);
+      pinMarkerGps.on('dragend', function(e){ var p=e.target.getLatLng(); dropPin('gps',p.lat,p.lng); });
+    }
+    setHint('gps','pinned','GPS pin at '+lat.toFixed(5)+', '+lng.toFixed(5)+' — drag to exact rooftop, then confirm.');
+  }
 }
 
-function confirmPin() {
-  if (!document.getElementById('latitude').value) return;
-  var lat = document.getElementById('latitude').value;
-  var lng = document.getElementById('longitude').value;
-  var house  = (document.getElementById('map-house').value  || '').trim();
-  var street = (document.getElementById('map-street').value || '').trim();
-  var city   = (document.getElementById('map-city').value   || '').trim();
-  var state  = (document.getElementById('state').value      || '').trim();
+function confirmLocation(panel) {
+  var lat, lng;
+  if (panel==='gps')   { lat=document.getElementById('lat-gps').value;   lng=document.getElementById('lng-gps').value; }
+  if (panel==='map')   { lat=document.getElementById('lat-map').value;   lng=document.getElementById('lng-map').value; }
+  if (panel==='gmaps') { lat=document.getElementById('lat-gmaps').value; lng=document.getElementById('lng-gmaps').value; }
+  if (!lat || !lng) return;
+  document.getElementById('latitude').value  = lat;
+  document.getElementById('longitude').value = lng;
+  var house='', street='', city='';
+  if (panel==='gmaps') {
+    house  = (document.getElementById('gm-house').value  ||'').trim();
+    street = (document.getElementById('gm-street').value ||'').trim();
+    city   = (document.getElementById('gm-city').value   ||'').trim();
+  } else if (panel==='map') {
+    house  = (document.getElementById('map-house').value  ||'').trim();
+    street = (document.getElementById('map-street').value ||'').trim();
+    city   = (document.getElementById('map-city').value   ||'').trim();
+  }
+  var state = (document.getElementById('state').value ||'').trim();
   document.getElementById('address').value = [house,street,city,state].filter(Boolean).join(', ');
-  if (pinMarker) pinMarker.bindPopup('<strong>Your property</strong><br>' + lat + ', ' + lng).openPopup();
-  setHint('confirmed', '✓ Aerial pin confirmed: ' + lat + ', ' + lng);
-  var badge = document.getElementById('confirm-badge');
-  badge.style.display = 'inline-flex';
-  document.getElementById('btn-confirm-pin').disabled = true;
-  // Street View button unlock removed — Street View is currently disabled (no API key).
-  // When re-enabled, add: document.getElementById('btn-load-sv').disabled = false;
-}
-
-function clearPin() {
-  if (pinMarker) { propMap.removeLayer(pinMarker); pinMarker = null; }
-  document.getElementById('latitude').value  = '';
-  document.getElementById('longitude').value = '';
-  document.getElementById('btn-confirm-pin').disabled = true;
-  document.getElementById('confirm-badge').style.display = 'none';
-  // Street View reset is a no-op (Street View disabled — no API key)
+  var btn = document.getElementById('btn-confirm-'+panel);
+  if (btn) btn.disabled = true;
+  var badge = document.getElementById('badge-'+panel);
+  if (badge) badge.style.display = 'inline-flex';
+  showBanner('✓ Location confirmed: '+parseFloat(lat).toFixed(5)+', '+parseFloat(lng).toFixed(5));
+  if (panel==='map') setHint('map','confirmed','✓ Confirmed: '+lat+', '+lng);
+  if (panel==='gps') setHint('gps','confirmed','✓ Confirmed: '+lat+', '+lng);
   resetStreetViewState();
-  setHint('idle', 'Pin cleared. Search your address or use GPS, then click your building.');
 }
 
-function setHint(type, msg) {
-  var el = document.getElementById('map-hint');
+function clearLocation(panel) {
+  if (panel==='map' && pinMarker)    { propMap.removeLayer(pinMarker); pinMarker=null; }
+  if (panel==='gps' && pinMarkerGps) { propMapGps.removeLayer(pinMarkerGps); pinMarkerGps=null; }
+  ['lat-gps','lng-gps','lat-map','lng-map','lat-gmaps','lng-gmaps'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('latitude').value='';
+  document.getElementById('longitude').value='';
+  var btn=document.getElementById('btn-confirm-'+panel); if(btn) btn.disabled=true;
+  var badge=document.getElementById('badge-'+panel); if(badge) badge.style.display='none';
+  hideBanner();
+  if(panel==='map') setHint('map','idle','Pin cleared. Enter address and click Find.');
+  if(panel==='gps') { setHint('gps','idle','GPS cleared.'); document.getElementById('gps-status').classList.remove('visible'); }
+}
+
+function syncLatLng(panel) {
+  var latId = panel==='gps'?'lat-gps':(panel==='map'?'lat-map':'lat-gmaps');
+  var lngId = panel==='gps'?'lng-gps':(panel==='map'?'lng-map':'lng-gmaps');
+  var lat = parseFloat(document.getElementById(latId).value);
+  var lng = parseFloat(document.getElementById(lngId).value);
+  if (isNaN(lat)||isNaN(lng)) return;
+  if (lat<3.5||lat>14.5||lng<2.5||lng>15.5) return;
+  var btn = document.getElementById('btn-confirm-'+panel);
+  if (btn) btn.disabled = false;
+  if (panel==='map' && propMap)    { propMap.setView([lat,lng],18);    dropPin('map',lat,lng); }
+  if (panel==='gps' && propMapGps) { propMapGps.setView([lat,lng],18); dropPin('gps',lat,lng); }
+}
+
+function showBanner(msg) {
+  var b = document.getElementById('loc-confirmed-banner');
+  if (!b) return;
+  document.getElementById('loc-confirmed-text').textContent = msg.replace('✓ ','');
+  b.style.display = 'flex';
+}
+function hideBanner() {
+  var b = document.getElementById('loc-confirmed-banner');
+  if (b) b.style.display = 'none';
+}
+
+function setHint(panel, type, msg) {
+  var id = panel==='gps' ? 'map-hint-gps' : 'map-hint';
+  var el = document.getElementById(id);
+  if (!el) return;
   el.className = 'map-status-bar ' + type;
-  document.getElementById('map-hint-text').textContent = msg;
+  var txtId = panel==='gps' ? 'map-hint-text-gps' : 'map-hint-text';
+  var txt = document.getElementById(txtId);
+  if (txt) txt.textContent = msg;
 }
 
-// ── Address search helpers ──────────────────────────────────────
-// Nominatim structured search (most accurate when OSM has the road)
+function useMyGPS() {
+  if (!navigator.geolocation) {
+    document.getElementById('gps-status-text').textContent = 'GPS not supported by your browser.';
+    document.getElementById('gps-status').classList.add('visible');
+    return;
+  }
+  document.getElementById('gps-status-text').textContent = 'Detecting your location…';
+  document.getElementById('gps-status').classList.add('visible');
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat=pos.coords.latitude, lng=pos.coords.longitude;
+      document.getElementById('gps-status-text').textContent = 'Located! Drag the pin to your exact rooftop.';
+      initGpsMap(lat, lng);
+    },
+    function(err) { document.getElementById('gps-status-text').textContent = 'GPS error: '+err.message; },
+    { enableHighAccuracy:true, timeout:12000 }
+  );
+}
+
 function _nominatimFetch(params) {
   var base = 'https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=ng&addressdetails=1&';
   return fetch(base + new URLSearchParams(params).toString(), {
-    headers: { 'Accept-Language': 'en', 'User-Agent': 'SolarSignupNG/7' }
+    headers:{'Accept-Language':'en','User-Agent':'SolarSignupNG/8'}
   }).then(function(r){ return r.json(); });
 }
-
-// Photon geocoder (uses OpenStreetMap data, different index — often finds what Nominatim misses)
 function _photonFetch(q) {
-  return fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&limit=3&lang=en&bbox=2.5,4.0,15.0,14.0')
+  return fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&limit=3&lang=en&bbox=2.5,4.0,15.0,14.0')
     .then(function(r){ return r.json(); })
     .then(function(fc){
-      // normalise to Nominatim-like objects
-      if (!fc || !fc.features || !fc.features.length) return [];
+      if (!fc||!fc.features||!fc.features.length) return [];
       return fc.features.map(function(f){
-        return {
-          lat:  String(f.geometry.coordinates[1]),
-          lon:  String(f.geometry.coordinates[0]),
-          type: f.properties.type || 'place',
-          display_name: [
-            f.properties.name,
-            f.properties.street,
-            f.properties.city,
-            f.properties.state,
-            'Nigeria'
-          ].filter(Boolean).join(', ')
+        return { lat:String(f.geometry.coordinates[1]), lon:String(f.geometry.coordinates[0]),
+          type:f.properties.type||'place',
+          display_name:[f.properties.name,f.properties.street,f.properties.city,f.properties.state,'Nigeria'].filter(Boolean).join(', ')
         };
       });
     });
 }
-
-// Score a result — prefer results that are close/specific
 function _bestResult(results) {
-  if (!results || !results.length) return null;
-  // Prefer house/building > road > suburb/neighbourhood > place
-  var rank = { house:5, building:5, road:4, residential:3, suburb:2, neighbourhood:2, town:1, city:0, place:0 };
-  results.sort(function(a,b){ return (rank[b.type]||0) - (rank[a.type]||0); });
+  if (!results||!results.length) return null;
+  var rank={house:5,building:5,road:4,residential:3,suburb:2,neighbourhood:2,town:1,city:0,place:0};
+  results.sort(function(a,b){ return (rank[b.type]||0)-(rank[a.type]||0); });
   return results[0];
 }
 
 function searchAddress() {
-  var house  = (document.getElementById('map-house').value  || '').trim();
-  var street = (document.getElementById('map-street').value || '').trim();
-  var city   = (document.getElementById('map-city').value   || '').trim();
-  var state  = (document.getElementById('state').value      || '').trim();
-
-  if (!street && !city) {
-    setHint('pinned', 'Please enter at least a street name or city/area.');
-    return;
-  }
-
-  // Build a human-readable label for the status bar
-  var displayLabel = [house, street, city, state].filter(Boolean).join(', ');
-  setHint('searching', 'Searching for "' + displayLabel + '"…');
-
-  // ── Strategy 1: Nominatim structured query ────────────────────
-  var structuredParams = { countrycodes:'ng' };
-  if (house)  structuredParams.housenumber = house;
-  if (street) structuredParams.street      = street;
-  if (city)   structuredParams.city        = city;
-  if (state)  structuredParams.state       = state;
-  structuredParams.country = 'Nigeria';
-
-  // ── Strategy 2: Nominatim free-form (street + area) ──────────
-  var freeQuery1 = [house, street, city, state, 'Nigeria'].filter(Boolean).join(', ');
-
-  // ── Strategy 3: Nominatim free-form without house number ─────
-  var freeQuery2 = [street, city, state, 'Nigeria'].filter(Boolean).join(', ');
-
-  // ── Strategy 4: City/LGA only ─────────────────────────────────
-  var cityQuery  = [city, state, 'Nigeria'].filter(Boolean).join(', ');
-
-  // ── Strategy 5: Photon (different index, good for Nigerian streets) ──
-  var photonQuery = [street, city, state, 'Nigeria'].filter(Boolean).join(' ');
-
-  // Run strategies in sequence, stopping at first good result
-  _nominatimFetch(structuredParams)
-    .then(function(r1) {
-      var best = _bestResult(r1);
-      if (best) return best;
-
-      // S2: Nominatim free-form with house
-      return _nominatimFetch({ q: freeQuery1 })
-        .then(function(r2) {
-          var best2 = _bestResult(r2);
-          if (best2) return best2;
-
-          // S3: Nominatim free-form without house
-          return _nominatimFetch({ q: freeQuery2 })
-            .then(function(r3) {
-              var best3 = _bestResult(r3);
-              if (best3) return best3;
-
-              // S4: Photon geocoder
-              return _photonFetch(photonQuery)
-                .then(function(r4) {
-                  var best4 = _bestResult(r4);
-                  if (best4) return best4;
-
-                  // S5: City/LGA fallback (zoom out a bit)
-                  return _nominatimFetch({ q: cityQuery })
-                    .then(function(r5) { return _bestResult(r5) || null; });
+  if (!propMap) initEmbeddedMap();
+  var house  = (document.getElementById('map-house').value  ||'').trim();
+  var street = (document.getElementById('map-street').value ||'').trim();
+  var city   = (document.getElementById('map-city').value   ||'').trim();
+  var state  = (document.getElementById('state').value      ||'').trim();
+  if (!street&&!city) { setHint('map','pinned','Enter at least a street name or city.'); return; }
+  setHint('map','searching','Searching for "'+[house,street,city,state].filter(Boolean).join(', ')+'"…');
+  var sp={countrycodes:'ng',country:'Nigeria'};
+  if(house)sp.housenumber=house; if(street)sp.street=street; if(city)sp.city=city; if(state)sp.state=state;
+  _nominatimFetch(sp)
+    .then(function(r1){ var b=_bestResult(r1); if(b) return b;
+      return _nominatimFetch({q:[house,street,city,state,'Nigeria'].filter(Boolean).join(', ')})
+        .then(function(r2){ var b=_bestResult(r2); if(b) return b;
+          return _nominatimFetch({q:[street,city,state,'Nigeria'].filter(Boolean).join(', ')})
+            .then(function(r3){ var b=_bestResult(r3); if(b) return b;
+              return _photonFetch([street,city,state,'Nigeria'].filter(Boolean).join(' '))
+                .then(function(r4){ var b=_bestResult(r4); if(b) return b;
+                  return _nominatimFetch({q:[city,state,'Nigeria'].filter(Boolean).join(', ')})
+                    .then(function(r5){ return _bestResult(r5)||null; });
                 });
             });
         });
     })
     .then(function(result) {
-      if (!result) {
-        setHint('pinned', 'Address not found in any database. Zoom into the map manually and click your building.');
-        return;
-      }
-
-      var lat = parseFloat(result.lat);
-      var lon = parseFloat(result.lon);
-
-      // Choose zoom level based on how specific the result is
-      var typeZoom = {
-        house: 19, building: 19, road: 18, residential: 17,
-        suburb: 16, neighbourhood: 16, town: 15, city: 14, place: 13
-      };
-      var z = typeZoom[result.type] || 16;
-
-      // If we only matched at city level, show a different hint
-      var isCityLevel = (z <= 14);
-      propMap.setView([lat, lon], z);
-
-      if (isCityLevel) {
-        setHint('searching',
-          'Showing area: ' + result.display_name.split(',').slice(0,2).join(', ') +
-          '. Zoom in and click your building to pin it.');
-      } else {
-        setHint('searching',
-          'Found: ' + result.display_name.split(',').slice(0,3).join(', ') +
-          '. Click your building rooftop to pin it.');
-      }
+      if (!result) { setHint('map','pinned','Not found. Zoom in and click your rooftop, or use Option 3 (Google Maps).'); return; }
+      var lat=parseFloat(result.lat), lon=parseFloat(result.lon);
+      var typeZoom={house:19,building:19,road:18,residential:17,suburb:16,neighbourhood:16,town:15,city:14,place:13};
+      var z=typeZoom[result.type]||16;
+      propMap.setView([lat,lon],z);
+      setHint('map','searching', z<=14
+        ? 'Showing area: '+result.display_name.split(',').slice(0,2).join(', ')+'. Zoom in and click your building.'
+        : 'Found: '+result.display_name.split(',').slice(0,3).join(', ')+'. Click your rooftop to pin.');
     })
-    .catch(function(err) {
-      console.warn('Geocode error:', err);
-      setHint('pinned', 'Search failed. Try the GPS button, or zoom and click the map manually.');
-    });
+    .catch(function(){ setHint('map','pinned','Search failed. Zoom in and click your building manually.'); });
 }
 
-function useMyGPS() {
-  if (!navigator.geolocation) { setHint('pinned','GPS not supported by your browser.'); return; }
-  setHint('searching','Detecting your GPS location…');
-  navigator.geolocation.getCurrentPosition(
-    function(pos){ propMap.setView([pos.coords.latitude,pos.coords.longitude],19); setHint('searching','GPS found you — click your building rooftop to pin it.'); },
-    function(err){ setHint('pinned','GPS error: '+err.message+'. Use the address search instead.'); },
-    { enableHighAccuracy:true, timeout:10000 }
-  );
+function buildGMapsLink(e) {
+  var house  = (document.getElementById('gm-house').value  ||'').trim();
+  var street = (document.getElementById('gm-street').value ||'').trim();
+  var city   = (document.getElementById('gm-city').value   ||'').trim();
+  var state  = (document.getElementById('state').value     ||'').trim();
+  var q = [house,street,city,state,'Nigeria'].filter(Boolean).join(', ');
+  var url = q.replace(/^,\s*/,'').length > 7
+    ? 'https://www.google.com/maps/search/' + encodeURIComponent(q)
+    : 'https://www.google.com/maps';
+  document.getElementById('btn-open-gmaps').href = url;
 }
 
-// ══════════════════════════════════════════
-// STREET VIEW CONFIRMATION — NULLED OUT
-// ══════════════════════════════════════════
-// All Street View functions are disabled pending a Google Maps API key.
-// To re-enable in future:
-//   1. Obtain a billing-enabled Google Maps API key from Google Cloud Console.
-//   2. Set GOOGLE_MAPS_KEY variable at the top of this script.
-//   3. Un-comment the Street View HTML block in Step 2 of the form.
-//   4. Replace the null stubs below with the full implementations (preserved in comments).
-//
-// PRESERVED FULL IMPLEMENTATIONS (un-comment and move out when API key is ready):
-//
-// var svLoaded = false;
-//
-// function resetStreetViewState() {
-//   svLoaded = false;
-//   document.getElementById('sv-map-container').style.display = 'none';
-//   document.getElementById('sv-placeholder').style.display = 'flex';
-//   document.getElementById('sv-confirm-bar').classList.remove('visible');
-//   document.getElementById('sv-confirmed-badge').style.display = 'none';
-//   document.getElementById('sv-skip-note').style.display = 'none';
-//   document.getElementById('btn-load-sv').disabled = true;
-// }
-//
-// function loadStreetView() {
-//   var lat = document.getElementById('latitude').value;
-//   var lng = document.getElementById('longitude').value;
-//   if (!lat || !lng) return;
-//   document.getElementById('sv-placeholder').style.display = 'none';
-//   document.getElementById('sv-map-container').style.display = 'block';
-//   var svUrl = 'https://www.google.com/maps/embed/v1/streetview'
-//     + '?key=' + GOOGLE_MAPS_KEY
-//     + '&location=' + lat + ',' + lng
-//     + '&heading=0&pitch=0&fov=90';
-//   document.getElementById('sv-iframe').src = svUrl;
-//   document.getElementById('sv-confirm-bar').classList.add('visible');
-//   svLoaded = true;
-// }
-//
-// function confirmStreetView() {
-//   document.getElementById('sv-confirm-bar').classList.remove('visible');
-//   document.getElementById('sv-confirmed-badge').style.display = 'inline-flex';
-//   document.getElementById('sv-skip-note').style.display = 'none';
-// }
-//
-// function skipStreetView() {
-//   document.getElementById('sv-confirm-bar').classList.remove('visible');
-//   document.getElementById('sv-confirmed-badge').style.display = 'none';
-//   document.getElementById('sv-skip-note').style.display = 'inline';
-// }
+document.addEventListener('DOMContentLoaded', function() {
+  ['gm-house','gm-street','gm-city'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', function(){ buildGMapsLink({}); });
+  });
+});
 
-// NULL STUBS — These prevent JS errors from any residual calls
-var svLoaded = false; // kept as a harmless flag
-function resetStreetViewState() { /* no-op: Street View disabled */ }
-function loadStreetView()        { /* no-op: Street View disabled */ }
-function confirmStreetView()     { /* no-op: Street View disabled */ }
-function skipStreetView()        { /* no-op: Street View disabled */ }
+// Compatibility stubs
+function confirmPin()        { confirmLocation(_activeMethod||'map'); }
+function clearPin()          { clearLocation(_activeMethod||'map'); }
+function onManualLatLng()    { syncLatLng(_activeMethod||'map'); }
+function updateGMapsLink()   {}
+var svLoaded = false;
+function resetStreetViewState() {}
+function loadStreetView()        {}
+function confirmStreetView()     {}
+function skipStreetView()        {}
 
 // ══════════════════════════════════════════
 // FORM SUBMISSION
@@ -2455,7 +2655,8 @@ document.getElementById('solar-registration-form').addEventListener('submit', fu
     'distribution-band':'Distribution Band','consumption-value':'Avg Consumption Value',
     'consumption-unit':'Avg Consumption Unit','last-months-value':'Last 3 Months Value',
     'last-months-unit':'Last 3 Months Unit','coverage-level':'Coverage Level',
-    'referral-name':'Referral Name','referral-phone':'Referral Phone'
+    'referral-name':'Referral Name','referral-phone':'Referral Phone',
+    'partner-company':'Partner Company'
   };
 
   var data = {};
@@ -2486,11 +2687,24 @@ document.getElementById('solar-registration-form').addEventListener('submit', fu
     .then(function(){
       btn.disabled=false; btn.textContent='☀ Submit My Solar Registration';
       document.getElementById('solar-registration-form').reset();
-      clearPin();
+      clearLocation(_activeMethod || 'map');
+      _activeMethod = null;
+      ['gps','map','gmaps'].forEach(function(m){
+        var c=document.getElementById('lmc-'+m); if(c) c.classList.remove('active');
+        var p=document.getElementById('lmp-'+m); if(p) p.classList.remove('active');
+      });
+      hideBanner();
       if (propMap) propMap.setView([9.082,8.6753],6);
       document.querySelectorAll('.cov-card').forEach(function(c){ c.classList.remove('selected'); });
       document.getElementById('coverage-level').value = '';
       document.querySelectorAll('.radio-card').forEach(function(c){ c.classList.remove('selected'); });
+      // Reset partner toggle
+      document.getElementById('is-partner-toggle').checked = false;
+      document.getElementById('partner-company-field').classList.remove('visible');
+      document.getElementById('partner-company').value = '';
+      // Hide Google Maps link
+      var gmRow = document.getElementById('gmaps-link-row');
+      if (gmRow) gmRow.classList.remove('visible');
       goStep(1);
       // Show SunSim upsell modal
       showSunSimModal();
@@ -2852,40 +3066,46 @@ function initLookupPayment() {
 }
 
 function onLookupPaymentSuccess(reference) {
-  var d = _lookupClient || {};
+  if (!_lookupClient) return;
+  var d = _lookupClient;
   var now = new Date();
 
-  // Log the paid payment to the sheet (same as main flow)
+  // Log paid status to Google Sheet
   var receiptData = {
-    timestamp:       now.toISOString(),
-    name:            d.name    || '',
-    email:           d.email   || '',
-    phone:           d.phone   || '',
-    address:         d.address || '',
-    latitude:        d.lat     || '',
-    longitude:       d.lng     || '',
-    product:         'SunSim Site Assessment Report',
-    amount:          SUNSIM_AMOUNT,
-    reference:       reference,
-    payment_status:  'paid',
-    payment_date:    now.toISOString(),
-    sunsim_status:   'paid',
-    receipt_ref:     reference,
-    source:          'lookup_modal'
+    timestamp:      now.toISOString(),
+    name:           d.name  || '',
+    email:          d.email || '',
+    phone:          d.phone || '',
+    lat:            d.lat   || '',
+    lng:            d.lng   || '',
+    product:        'SunSim Site Assessment Report',
+    amount:         SUNSIM_AMOUNT,
+    reference:      reference,
+    payment_status: 'paid',
+    payment_date:   now.toISOString(),
+    sunsim_status:  'paid',
+    receipt_ref:    reference,
+    source:         'lookup_modal'
   };
   logToSheet(receiptData);
 
-  // Show a paid receipt inside the lookup modal
+  // Build receipt rows
   document.getElementById('pl-receipt').innerHTML =
-    '<h4>🎉 Payment Confirmed!</h4>'
+    '<h4>✅ Payment Confirmed!</h4>'
     + plReceiptRow('Name',      d.name  || '—')
-    + plReceiptRow('Email',     d.email || '—')
     + plReceiptRow('Phone',     d.phone || '—')
-    + plReceiptRow('Product',   'SunSim Site Assessment')
+    + plReceiptRow('Email',     d.email || '—')
+    + plReceiptRow('Product',   'SunSim Site Assessment Report')
     + plReceiptRow('Amount',    '₦' + SUNSIM_AMOUNT.toLocaleString())
-    + plReceiptRow('Ref',       reference)
+    + plReceiptRow('Reference', reference)
     + plReceiptRow('Status',    '✓ Paid');
 
+  document.getElementById('pl-paid-note').textContent =
+    'Your SunSim report has been ordered. Expect delivery within 12–24 hours. '
+    + 'Please keep your reference number: ' + reference;
+
+  // Show the paid screen with receipt
+  document.getElementById('btn-pl-pay-receipt').style.display = 'none';
   plGoScreen('paid');
 }
 
