@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>SolarSignupNG — Power Your Future</title>
+<title>SolarSignupNG v8 — Power Your Future</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -254,6 +254,34 @@ nav {
 .field input[type=file] {
   padding:10px; background:var(--bg);
   border-style:dashed; font-size:0.85rem; color:var(--slate);
+}
+
+/* BILL UPLOAD */
+.bill-upload-box {
+  border:2px dashed var(--border); border-radius:var(--r); padding:20px;
+  text-align:center; cursor:pointer; transition:all 0.15s; background:var(--bg);
+  margin-top:6px;
+}
+.bill-upload-box:hover { border-color:var(--teal); background:#F0FDFA; }
+.bill-upload-box.has-files { border-color:var(--teal); border-style:solid; background:#F0FDFA; }
+.bill-upload-icon { font-size:1.8rem; margin-bottom:6px; }
+.bill-upload-label { font-size:0.88rem; font-weight:600; color:var(--ink); }
+.bill-upload-sub { font-size:0.75rem; color:var(--muted); margin-top:3px; }
+.bill-preview-row {
+  display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;
+}
+.bill-preview-item {
+  position:relative; width:76px; height:76px; border-radius:var(--r-sm);
+  border:1.5px solid var(--border); overflow:hidden; background:var(--bg);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.bill-preview-item img { width:100%; height:100%; object-fit:cover; }
+.bill-preview-item .bill-pdf-icon { font-size:1.6rem; }
+.bill-preview-item .bill-remove {
+  position:absolute; top:3px; right:3px; width:18px; height:18px;
+  background:var(--danger); color:#fff; border-radius:50%; border:none;
+  font-size:0.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-weight:700; line-height:1;
 }
 
 /* RADIO / METER */
@@ -1669,8 +1697,15 @@ footer {
           </div>
 
           <div class="field">
-            <label for="bill-upload">Upload Electricity Bill <span class="opt">(Optional)</span></label>
-            <input type="file" id="bill-upload" name="bill-upload" accept=".pdf,.jpg,.jpeg,.png">
+            <label for="bill-upload">Upload Electricity Bill <span class="opt">(Optional — up to 3 images or PDFs)</span></label>
+            <input type="file" id="bill-upload" name="bill-upload" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none">
+            <div class="bill-upload-box" id="bill-upload-box" onclick="document.getElementById('bill-upload').click()">
+              <div class="bill-upload-icon">📄</div>
+              <div class="bill-upload-label">Tap to select up to 3 files</div>
+              <div class="bill-upload-sub">.jpg · .png · .pdf · Max 5 MB each</div>
+            </div>
+            <div class="bill-preview-row" id="bill-preview-row"></div>
+            <div id="bill-upload-status" style="font-size:0.78rem;margin-top:6px;display:none;"></div>
           </div>
 
           <div class="step-nav">
@@ -2637,6 +2672,101 @@ function confirmStreetView()     {}
 function skipStreetView()        {}
 
 // ══════════════════════════════════════════
+// BILL UPLOAD UI
+// ══════════════════════════════════════════
+var _billFiles = []; // holds up to 3 File objects
+
+document.addEventListener('DOMContentLoaded', function() {
+  var input = document.getElementById('bill-upload');
+  if (!input) return;
+  input.addEventListener('change', function() {
+    var selected = Array.from(this.files);
+    // Merge with existing, cap at 3
+    selected.forEach(function(f) {
+      if (_billFiles.length < 3 && !_billFiles.find(function(x){ return x.name===f.name && x.size===f.size; })) {
+        _billFiles.push(f);
+      }
+    });
+    this.value = ''; // reset input so same file can be re-selected after removal
+    renderBillPreviews();
+  });
+});
+
+function renderBillPreviews() {
+  var box = document.getElementById('bill-upload-box');
+  var row = document.getElementById('bill-preview-row');
+  row.innerHTML = '';
+
+  if (_billFiles.length === 0) {
+    box.classList.remove('has-files');
+    box.querySelector('.bill-upload-label').textContent = 'Tap to select up to 3 files';
+    return;
+  }
+
+  box.classList.add('has-files');
+  box.querySelector('.bill-upload-label').textContent =
+    _billFiles.length + ' file' + (_billFiles.length > 1 ? 's' : '') + ' selected' +
+    (_billFiles.length < 3 ? ' — tap to add more' : ' (max reached)');
+
+  _billFiles.forEach(function(file, idx) {
+    var item = document.createElement('div');
+    item.className = 'bill-preview-item';
+
+    if (file.type === 'application/pdf') {
+      item.innerHTML = '<div class="bill-pdf-icon">📄</div>';
+    } else {
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      item.appendChild(img);
+    }
+
+    var rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'bill-remove';
+    rm.textContent = '✕';
+    rm.title = 'Remove ' + file.name;
+    rm.onclick = (function(i){ return function(e){ e.stopPropagation(); _billFiles.splice(i,1); renderBillPreviews(); }; })(idx);
+    item.appendChild(rm);
+    row.appendChild(item);
+  });
+}
+
+// ── Upload files to Drive via Apps Script ───────────────────────
+function uploadBillFiles(name) {
+  if (_billFiles.length === 0) return Promise.resolve([]);
+
+  // Sanitise name for use as a filename prefix: alphanumeric + spaces only
+  var safeName = name.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '_') || 'User';
+
+  var promises = _billFiles.map(function(file, idx) {
+    return new Promise(function(resolve) {
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var b64 = ev.target.result.split(',')[1]; // strip data:...;base64,
+        var ext = file.name.split('.').pop().toLowerCase();
+        var fileName = safeName + '_' + (idx + 1) + '.' + ext;
+
+        fetch(SCRIPT_URL + '?action=uploadBill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            fileName: fileName,
+            mimeType: file.type,
+            data:     b64
+          }).toString()
+        })
+        .then(function(r){ return r.json().catch(function(){ return {}; }); })
+        .then(function(res){ resolve({ file: fileName, ok: res.result === 'success', url: res.url || '' }); })
+        .catch(function(){ resolve({ file: fileName, ok: false }); });
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  return Promise.all(promises);
+}
+
+// ══════════════════════════════════════════
 // FORM SUBMISSION
 // ══════════════════════════════════════════
 document.getElementById('solar-registration-form').addEventListener('submit', function(e) {
@@ -2666,26 +2796,66 @@ document.getElementById('solar-registration-form').addEventListener('submit', fu
   data['Coverage Level'] = document.getElementById('coverage-level').value;
   data['SunSim Status']  = 'not_paid';
 
-  var addrHouse  = (document.getElementById('map-house').value  || '').trim();
-  var addrStreet = (document.getElementById('map-street').value || '').trim();
-  var addrCity   = (document.getElementById('map-city').value   || '').trim();
-  var addrState  = (document.getElementById('state').value      || '').trim();
-  data['Address'] = [addrHouse, addrStreet, addrCity, addrState].filter(Boolean).join(', ');
+  // Address: prefer the confirmed hidden field, fall back to map fields
+  var confirmedAddr = document.getElementById('address').value;
+  if (!confirmedAddr) {
+    var addrHouse  = (document.getElementById('map-house')  ? (document.getElementById('map-house').value  ||'') : '').trim();
+    var addrStreet = (document.getElementById('map-street') ? (document.getElementById('map-street').value ||'') : '').trim();
+    var addrCity   = (document.getElementById('map-city')   ? (document.getElementById('map-city').value   ||'') : '').trim();
+    var addrState  = (document.getElementById('state').value||'').trim();
+    confirmedAddr = [addrHouse,addrStreet,addrCity,addrState].filter(Boolean).join(', ');
+  }
+  data['Address'] = confirmedAddr;
+
+  var registrantName = data['Full Name'] || '';
 
   // Store for SunSim payment context
   window._registrantData = {
-    name: data['Full Name'] || '',
-    email: data['Email'] || '',
-    phone: data['Phone'] || '',
-    lat: data['Latitude'],
-    lng: data['Longitude'],
+    name:    registrantName,
+    email:   data['Email']   || '',
+    phone:   data['Phone']   || '',
+    lat:     data['Latitude'],
+    lng:     data['Longitude'],
     address: data['Address'],
-    state: data['State'] || ''
+    state:   data['State']   || ''
   };
 
-  fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data).toString() })
-    .then(function(){
-      btn.disabled=false; btn.textContent='☀ Submit My Solar Registration';
+  // ── Step 1: Upload bill files (if any), then submit registration ──
+  var uploadStatus = document.getElementById('bill-upload-status');
+  if (_billFiles.length > 0) {
+    btn.textContent = '⏳ Uploading bills…';
+    if (uploadStatus) { uploadStatus.style.display='block'; uploadStatus.style.color='var(--teal)'; uploadStatus.textContent='Uploading electricity bill(s)…'; }
+  }
+
+  uploadBillFiles(registrantName)
+    .then(function(uploadResults) {
+      // Attach upload summary to submission data
+      if (uploadResults.length > 0) {
+        data['Bill Files'] = uploadResults.map(function(r){ return r.file + (r.ok ? ' ✓' : ' ✗'); }).join(', ');
+        if (uploadStatus) {
+          var allOk = uploadResults.every(function(r){ return r.ok; });
+          uploadStatus.style.color = allOk ? 'var(--success)' : 'var(--warning)';
+          uploadStatus.textContent = allOk
+            ? '✓ ' + uploadResults.length + ' bill file(s) uploaded to Drive'
+            : '⚠ Some files may not have uploaded — registration will still proceed';
+        }
+      }
+
+      btn.textContent = '⏳ Saving registration…';
+
+      // ── Step 2: POST registration data ───────────────────────
+      return fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(data).toString()
+      });
+    })
+    .then(function() {
+      btn.disabled = false; btn.textContent = '☀ Submit My Solar Registration';
+      _billFiles = [];
+      renderBillPreviews();
+      if (uploadStatus) uploadStatus.style.display = 'none';
+
       document.getElementById('solar-registration-form').reset();
       clearLocation(_activeMethod || 'map');
       _activeMethod = null;
@@ -2698,22 +2868,19 @@ document.getElementById('solar-registration-form').addEventListener('submit', fu
       document.querySelectorAll('.cov-card').forEach(function(c){ c.classList.remove('selected'); });
       document.getElementById('coverage-level').value = '';
       document.querySelectorAll('.radio-card').forEach(function(c){ c.classList.remove('selected'); });
-      // Reset partner toggle
       document.getElementById('is-partner-toggle').checked = false;
       document.getElementById('partner-company-field').classList.remove('visible');
       document.getElementById('partner-company').value = '';
-      // Hide Google Maps link
       var gmRow = document.getElementById('gmaps-link-row');
       if (gmRow) gmRow.classList.remove('visible');
       goStep(1);
-      // Show SunSim upsell modal
       showSunSimModal();
     })
-    .catch(function(){
+    .catch(function() {
       var s = document.getElementById('form-status');
       s.className = 'status-msg error'; s.style.display = 'block';
       s.innerHTML = '<p>Submission failed. Please check your connection and try again.</p>';
-      btn.disabled=false; btn.textContent='☀ Submit My Solar Registration';
+      btn.disabled = false; btn.textContent = '☀ Submit My Solar Registration';
     });
 });
 
